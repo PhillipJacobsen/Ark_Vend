@@ -1,7 +1,8 @@
 /********************************************************************************
-    Demo IOT project that interacts with the Ark blockchain
+    Proof of Concept Project
+	This projects illustrates a vending machine that accepts Ark Cryptocurrency for payment.
 
-    ArkJsonParse.ino
+    Ark_Vend.ino
     2019 @phillipjacobsen
 
     Program Features:
@@ -10,7 +11,9 @@
     Ark Cpp Client available from Ark Ecosystem <info@ark.io>
     Ark API documentation:  https://docs.ark.io/sdk/clients/usage.html
 
-    Status information is shown on small 0.96 128x64 OLED display
+    Electronic Hardware Peripherals:
+		Adafruit TFT FeatherWing 2.4" 320x240 Touchscreen
+
 
 
 
@@ -24,16 +27,24 @@
 /********************************************************************************
                Electronic Hardware Requirements and Pin Connections
    ESP32 Adafruit Huzzah
-      Source:
+      Source: https://www.adafruit.com/product/3315
 
 
-    0.96 I2C 128x64 OLED display
-      Source:    https://www.aliexpress.com/store/product/Free-shipping-Matrix-360-NAND-Programmer-MTX-USB-SPI-Flasher-V1-0-For-XBOX-360-Game/334970_1735255916.html?spm=2114.12010612.0.0.73fe44c9mSwirS
-      Pins cannot be remapped when using DMA mode
-      SDA ->SDA
-      SCL ->SCL
-      VCC -> 3.3V
-      GND ->GND
+    TFT FeatherWing 2.4" 320x240 Touchscreen
+      Touchscreen is designed to plug direction into ESP32 Huzzah module
+		TFT_CS 	-> pin #15
+		TFT_DC 	-> pin #33
+		RT 		-> pin #32
+		SD		-> pin #14
+		SCK		-> SCK
+		MISO	-> MISO
+		MOSI	-> MOSI
+
+
+		NEOPIXEL-> pin #12
+		VCC -> 3.3V
+		GND
+
 ********************************************************************************/
 
 /********************************************************************************
@@ -79,20 +90,40 @@ RgbColor black(0);
 
 
 /********************************************************************************
-  U8g2lib Monochrome Graphics Display Library
-    Available through Arduino Library Manager
-    https://github.com/olikraus/u8g2
+    QRCode by Richard Moore version 0.0.1
+      Available through Arduino Library Manager
+        https://github.com/ricmoo/QRCode
 
-  Frame Buffer Examples: clearBuffer/sendBuffer. Fast, but may not work with all Arduino boards because of RAM consumption
-  Page Buffer Examples: firstPage/nextPage. Less RAM usage, should work with all Arduino boards.
-  U8x8 Text Only Example: No RAM usage, direct communication with display controller. No graphics, 8x8 Text only.
+    The QR code data encoding algorithm defines a number of 'versions' that increase in size and store increasing amounts of data.
+    The version (size) of a generated QR code depends on the amount of data to be encoded.
+    Increasing the error correction level will decrease the storage capacity due to redundancy pixels being added.
+
+    If you have a ? in your QR text then I think the QR code operates in "Byte" mode.
 ********************************************************************************/
-#include <U8g2lib.h>
+#include "qrcode.h"
+const int QRcode_Version = 8;   //  set the version (range 1->40)
+const int QRcode_ECC = 0;       //  set the Error Correction level (range 0-3) or symbolic (ECC_LOW, ECC_MEDIUM, ECC_QUARTILE and ECC_HIGH)
+QRCode qrcode;                  // Create the QR code
 
-// U8g2 Constructor List for Frame Buffer Mode.
-// This uses the Hardware I2C peripheral on ESP32 with DMA interface
-// The complete list is available here: https://github.com/olikraus/u8g2/wiki/u8g2setupcpp
-U8G2_SSD1306_128X64_NONAME_F_HW_I2C u8g2(U8G2_R0, /* reset=*/ U8X8_PIN_NONE);
+
+/***************************************************
+  GFX libraries for the Adafruit ILI9341 2.4" 240x320 TFT FeatherWing
+  ----> http://www.adafruit.com/products/3315
+
+ ****************************************************/
+
+#include <SPI.h>
+#include <Adafruit_GFX.h>
+#include <Adafruit_ILI9341.h>
+
+#ifdef ESP32
+#define STMPE_CS 32
+#define TFT_CS   15
+#define TFT_DC   33
+#define SD_CS    14
+#endif
+
+Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
 #define Lcd_X  128
 #define Lcd_Y  64
@@ -469,9 +500,10 @@ int getReceivedTransaction(const char *const address, int page, const char* &id,
 
 
 void setupWiFi() {
-  u8g2.setFont(u8g2_font_9x15_tf );       // 10 pixel height  configure font used for OLED display
-  u8g2.drawStr(0, 12, "WiFi Search");     // write text string to the internal memory of OLED; (x coordinate, y coordinate, string)
-  u8g2.sendBuffer();                      // transfer internal memory to the display
+  tft.setCursor(0, 0);
+  tft.setTextColor(ILI9341_WHITE);
+  tft.setTextSize(1);
+  tft.println("WiFi Search");
 
   WiFi.begin(ssid, password); // This starts your boards connection to WiFi.
   while (WiFi.status() != WL_CONNECTED) // This will delay your board from continuing until a WiFi connection is established.
@@ -484,11 +516,9 @@ void setupWiFi() {
   Serial.print("Connected, IP address: ");
   Serial.println(WiFi.localIP());
 
-  u8g2.clearBuffer();
-  u8g2.drawStr(0, 12, "Connected to");  // write text string to the internal memory of OLED; (x coordinate, y coordinate, string)
-  u8g2.setCursor(0, 30);
-  u8g2.print(WiFi.localIP());           // display IP address
-  u8g2.sendBuffer();                    // transfer internal memory to the display
+  tft.fillScreen(ILI9341_BLACK);
+  tft.println("Connected to");
+  tft.println(WiFi.localIP());
 }
 
 
@@ -558,17 +588,8 @@ void setup()
   Serial.begin(115200);     // Initialize Serial Connection for debug / display
 
 
-
-
-
-  //setup OLED display
-  u8g2.begin();             // initialize OLED
-  u8g2.clearBuffer();
-  u8g2.setContrast(220);    // set OLED brightness(0->255)
-  //u8g2.setFont(u8g2_font_ncenB12_tr );  // 12 pixel height  configure font used for OLED display
-  //u8g2.setFont(u8g2_font_ncenB08_tr);   // 8 pixel height  configure font used for OLED display
-  //u8g2.setFont(u8g2_font_9x15_tf );     // 10 pixel height  configure font used for OLED display
-  //u8g2.setFont(u8g2_font_6x13_te );     // 9 pixel height  configure font used for OLED display
+  tft.begin();              //setup TFT display
+  tft.fillScreen(ILI9341_BLACK);  //clear screen
 
   setupWiFi();  //configure WiFi connection
 
@@ -646,6 +667,12 @@ void setup()
 //    }
 //    Serial.println(&timeinfo, "%A, %B %d %Y %H:%M:%S");
 //  }
+
+
+void displayQR(
+
+
+
 
 
 
