@@ -1,6 +1,7 @@
-
-
-
+/********************************************************************************
+  This file functions that interact with Ark client 
+code here is a hack right now. Just learning the API and working on basic program flow and function
+********************************************************************************/
 
 
 int searchReceivedTransaction(const char *const address, int page, const char* &id, int &amount, const char* &senderAddress, const char* &vendorField ) {
