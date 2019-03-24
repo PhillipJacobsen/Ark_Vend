@@ -1,4 +1,10 @@
 /********************************************************************************
+  This file contains functions used to configure hardware perhipherals and various libraries.
+********************************************************************************/
+
+
+
+/********************************************************************************
   This routine waits for a connection to your WiFi network according to "ssid" and "password" defined previously
 ********************************************************************************/
 void setupWiFi() {
