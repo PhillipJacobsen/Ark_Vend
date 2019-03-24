@@ -178,7 +178,7 @@ Ark::Client::Connection<Ark::Client::Api> connection(peer, port);
 //};
 
 //--------------------------------------------
-// these variables are used to store the received transation details returned from wallet search
+// these are used to store the received transation details returned from wallet search
 const char*  id;            //transaction ID
 int amount;                 //transactions amount
 const char* senderAddress;  //transaction address of sender
