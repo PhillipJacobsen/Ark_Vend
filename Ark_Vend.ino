@@ -6,7 +6,7 @@
     2019 @phillipjacobsen
 
     Program Features:
-    This program has been tested with ESP32 Adafruit Huzzah however it should also work with ESP8266 modules with minor changes to hardward connections and wifi libraries.
+    This program has been tested with ESP32 Adafruit Huzzah however it should also work with ESP8266 modules with minor changes to hardware connections and wifi libraries.
     This sketch will use the ARK Cpp-Client API to interact with an Ark V2 Devnet node.
     Ark Cpp Client available from Ark Ecosystem <info@ark.io>
     Ark API documentation:  https://docs.ark.io/sdk/clients/usage.html
@@ -17,11 +17,6 @@
 
 
 
-    Encodes text string into a matrix representing the QR Code
-      -program does not check length of text to make sure the QRcode version is able to generate it
-    Displays the resulting code on the OLED display
-    The QRcode will be doubled in size so that each QR code pixel shows up as four pixels on the OLED display.
-    Default is lit background with Black QRcode. Inverse can also be displayed however codes seem to scan much better with lit background.
 ********************************************************************************/
 
 /********************************************************************************
@@ -45,6 +40,11 @@
 		VCC -> 3.3V
 		GND
 
+********************************************************************************/
+
+
+/********************************************************************************
+                              Library Requirements
 ********************************************************************************/
 
 /********************************************************************************
@@ -84,8 +84,6 @@ RgbColor blue(0, 0, colorSaturation);
 RgbColor off(0, 0, 0);
 RgbColor redgreen(colorSaturation, colorSaturation, 0);
 RgbColor greenblue(0, colorSaturation, colorSaturation);
-
-
 RgbColor black(0);
 
 
@@ -103,6 +101,8 @@ RgbColor black(0);
 #include "qrcode.h"
 const int QRcode_Version = 8;   //  set the version (range 1->40)
 const int QRcode_ECC = 0;       //  set the Error Correction level (range 0-3) or symbolic (ECC_LOW, ECC_MEDIUM, ECC_QUARTILE and ECC_HIGH)
+#define _QR_doubleSize     //
+
 QRCode qrcode;                  // Create the QR code
 
 
@@ -111,7 +111,6 @@ QRCode qrcode;                  // Create the QR code
   ----> http://www.adafruit.com/products/3315
 
  ****************************************************/
-
 #include <SPI.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
@@ -174,7 +173,7 @@ int amount;             //transactions amount
 const char* senderAddress;  //transaction address of sender
 const char* vendorField;    //vendor field
 
-int lastRXpage;     
+int lastRXpage;
 
 
 
@@ -216,7 +215,7 @@ const char* password = "6z5g4hbdxi";
 
 
 /*
-* Function prototypes
+  Function prototypes
 */
 void setup();
 
@@ -224,6 +223,12 @@ void setup();
 
 
 void loop() {
+
+  setupQRcode();
+  esp_deep_sleep_start();
+  delay(3000);
+
+
   //look for new transactions to arrive in wallet.
   Serial.print("\n\n\nLooking for new transaction\n");
 
@@ -295,8 +300,6 @@ void loop() {
   else {
 
   }
-
-
 
 
   delay(3000);
