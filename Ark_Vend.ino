@@ -174,6 +174,7 @@ const char* senderAddress;  //transaction address of sender
 const char* vendorField;    //vendor field
 
 int lastRXpage;
+int searchRXpage;
 
 
 
@@ -207,14 +208,9 @@ const char* password = "6z5g4hbdxi";
 
 
 
-
-
-
-
-
-/*
+/********************************************************************************
   Function prototypes
-*/
+********************************************************************************/
 void setup();
 
 //End Function Prototypes
@@ -222,17 +218,14 @@ void setup();
 
 void loop() {
 
-
-
-
   //look for new transactions to arrive in wallet.
   Serial.print("\n\n\nLooking for new transaction\n");
 
 
-  int page = lastRXpage + 1;
-  if ( searchReceivedTransaction(ArkAddress, page, id, amount, senderAddress, vendorField) ) {
+  searchRXpage = lastRXpage + 1;
+  if ( searchReceivedTransaction(ArkAddress, searchRXpage, id, amount, senderAddress, vendorField) ) {
     Serial.print("Page: ");
-    Serial.println(page);
+    Serial.println(searchRXpage);
     Serial.print("Transaction id: ");
     Serial.println(id);
     Serial.print("Amount(Arktoshi): ");
@@ -288,11 +281,11 @@ void loop() {
       //   u8g2.sendBuffer();                    // transfer internal memory to the display
 
     }
-
-
     lastRXpage++;
   }
 
+
+//no new transaction found.
   else {
 
   }
@@ -300,6 +293,6 @@ void loop() {
   setupQRcode();
 
   delay(3000);
-    esp_deep_sleep_start();
+  esp_deep_sleep_start();
 
 };
