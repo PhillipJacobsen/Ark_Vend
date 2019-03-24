@@ -22,5 +22,5 @@ Description of the current program flow.  status/debug info is also regularly se
   -check to see if Ark node is synced and display status
 2. search through all received transactions on wallet. Wallet address is displayed
   -"searching wallet + page#" will be displayed. text will toggle between red/white every received transaction
-3. # of transactions in wallet will be displayed
+3. number of transactions in wallet will be displayed
 4. QR code is displayed 
