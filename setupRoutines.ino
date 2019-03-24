@@ -111,7 +111,7 @@ void setup()
   //  NOTE! If useing the ESP8266 Make sure to call strip.Begin() after you call Serial.Begin because
   //    Din pin of NeoPixel is also connected to Serial RX pin(on ESP8266) and will configure the pin for usage by the DMA interface.
   strip.Begin();
-//  strip.Show(); // Initialize all pixels to 'off'
+  //  strip.Show(); // Initialize all pixels to 'off'
   strip.ClearTo(RgbColor(0, 0, 0)); // Initialize all pixels to 'off'
 
   //--------------------------------------------
@@ -125,7 +125,16 @@ void setup()
   //--------------------------------------------
   //  check to see if Ark Node is synced
   //  node is defined previously with "peer" and "port"
-  checkArkNodeStatus();
+  //  returns True if node is synced to chain
+  if (checkArkNodeStatus()) {
+    Serial.print("\nNode is Synced: ");
+    tft.println("Ark Node is synced");
+  }
+  else {
+    Serial.print("\nNode is NOT Synced: ");
+    tft.println("Ark Node is NOT synced");
+  }
+
 
 
   //--------------------------------------------
@@ -134,7 +143,7 @@ void setup()
   //  Because we read 1 trasactions at a time the page number returned by the API tells us how many transactions there are.
   //  Every transaction received will toggle the color of "searching wallet: " text between red and white.
   //  Once we have read all the transactions we will display the total number of transactions in wallet.
-  //  
+  //
   CursorX = tft.getCursorX();     //get current cursor position
   CursorY = tft.getCursorY();     //get current cursor position
   tft.println("searching wallet: ");
@@ -142,7 +151,7 @@ void setup()
 
   lastRXpage = getMostRecentReceivedTransaction();  //lastRXpage is equal to the page number of the last received transaction in the wallet.
 
-  tft.setTextColor(ILI9341_WHITE);   
+  tft.setTextColor(ILI9341_WHITE);
   tft.setCursor(CursorX, CursorY);
   tft.println("searching wallet: ");
   tft.println(ArkAddress);
