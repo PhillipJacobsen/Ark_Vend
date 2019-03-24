@@ -184,7 +184,17 @@ bool checkArkNodeStatus() {
 
 
 
-/****************************************/
+/********************************************************************************
+  This routine will search through all the received transactions of ArkAddress wallet starting from the oldest.
+  "searching wallet + page#" will be displayed. text will toggle between red/white every received transaction
+  The page number of the last transaction in the search will be displayed. 
+  This is the page to the most newest receive transaction on the chain.
+  The final page number is also equal to the total number of received transactions in the wallet. 
+
+  The routine returns the page number of the most recent transaction.
+  Empty wallet will return '0' (NOT YET TESTED)
+
+********************************************************************************/
 int getMostRecentReceivedTransaction() {
   Serial.print("\n\n\nHere are all the transactions in a wallet\n");
 
