@@ -2,6 +2,8 @@
     Proof of Concept Project
 	This projects illustrates a vending machine that accepts Ark Cryptocurrency for payment.
 
+  NOT COMPLETE
+
     Ark_Vend.ino
     2019 @phillipjacobsen
 
@@ -13,6 +15,7 @@
 
     Electronic Hardware Peripherals:
 		Adafruit TFT FeatherWing 2.4" 320x240 Touchscreen
+    Adafruit NeoPixels
 
 
 
@@ -49,7 +52,7 @@
 
 /********************************************************************************
 
-  // I NEED TO UPDATE COMMENTS FOR ESP32 module
+  // I NEED TO UPDATE COMMENTS FOR ESP32 module. These comments are for ESP8266
 
     Makuna NeoPixel Library - optimized for ESP8266
       Available through Arduino Library Manager however development is done using lastest Master Branch on Github
@@ -101,16 +104,15 @@ RgbColor black(0);
 #include "qrcode.h"
 const int QRcode_Version = 8;   //  set the version (range 1->40)
 const int QRcode_ECC = 0;       //  set the Error Correction level (range 0-3) or symbolic (ECC_LOW, ECC_MEDIUM, ECC_QUARTILE and ECC_HIGH)
-#define _QR_doubleSize     //
+#define _QR_doubleSize          //  This will double the display size of the generated code. Every pixel becomes a 4x4 square.
 
 QRCode qrcode;                  // Create the QR code
 
 
-/***************************************************
+/********************************************************************************
   GFX libraries for the Adafruit ILI9341 2.4" 240x320 TFT FeatherWing
   ----> http://www.adafruit.com/products/3315
-
- ****************************************************/
+********************************************************************************/
 #include <SPI.h>
 #include <Adafruit_GFX.h>
 #include <Adafruit_ILI9341.h>
@@ -123,14 +125,14 @@ QRCode qrcode;                  // Create the QR code
 #endif
 
 Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
+#include <Fonts/FreeSans9pt7b.h>        //add custom fonts here
 
-#include <Fonts/FreeSans9pt7b.h>
+#define Lcd_X  240       //configure your screen dimensions.  We aren't using an LCD for this project so I should rename to something more generic               
+#define Lcd_Y  320       //configure your screen dimensions    
 
-#define Lcd_X  240
-#define Lcd_Y  320
+int CursorX = 0;         //used to store current cursor position of the display
+int CursorY = 0;         //used to store current cursor position of the display
 
-int CursorX = 0;
-int CursorY = 0;
 
 /********************************************************************************
    Ark Client Library
@@ -159,8 +161,8 @@ Ark::Client::Connection<Ark::Client::Api> connection(peer, port);
 /**/
 
 
-
 //I think a structure here for transaction details would be better form
+//I need to do some work here to make things less hacky
 //struct transactionDetails {
 //   const char*  id;
 //   int amount;
@@ -168,54 +170,67 @@ Ark::Client::Connection<Ark::Client::Api> connection(peer, port);
 //   const char* vendorField;
 //};
 
-const char*  id;         //transaction ID
-int amount;             //transactions amount
+//--------------------------------------------
+// these variables are used to store the received transation details returned from wallet search
+const char*  id;            //transaction ID
+int amount;                 //transactions amount
 const char* senderAddress;  //transaction address of sender
 const char* vendorField;    //vendor field
 
-int lastRXpage;
-int searchRXpage;
-
+int lastRXpage;             //page number of the last received transaction in wallet
+int searchRXpage;           //page number that is used for wallet search
 
 
 
 /********************************************************************************
    Arduion Json Libary
     Available through Arduino Library Manager
+    Data returned from Ark API is in JSON format.
+    This libary is used to parse and deserialize the reponse
 ********************************************************************************/
 #include <ArduinoJson.h>
 
 
 /********************************************************************************
-
+  Time Library
+  required for internal clock to syncronize with NTP server.
+  I need to do a bit more work in regards to Daylight savings time and the periodic sync time with the NTP service after initial syncronization
 ********************************************************************************/
 #include "time.h"
 //#include <TimeLib.h>    //https://github.com/PaulStoffregen/Time
-int timezone = -6;      //MST
-int dst = 0;         //To enable Daylight saving time set it to 3600. Otherwise, set it to 0. This doesn't seem to work.
+int timezone = -6;        //set your timezone MST
+int dst = 0;              //To enable Daylight saving time set it to 3600. Otherwise, set it to 0. This doesn't seem to work.
 
 
 /********************************************************************************
-   WiFi Library
-
+  WiFi Library
+  If using the ESP8266 I believe you will need to #include <ESP8266WiFi.h> instead of WiFi.h
 ********************************************************************************/
 #include <WiFi.h>
-
-/* This is the WiFi network you'd like your board to connect to. */
+//--------------------------------------------
+//This is your WiFi network parameters that you need to configure
 const char* ssid = "TELUS0183";
 const char* password = "6z5g4hbdxi";
-/**/
+//const char* ssid = "xxxxxxxxxx";
+//const char* password = "xxxxxxxxxx";
 
 
 
 /********************************************************************************
   Function prototypes
+  Arduino IDE normally does its automagic here and creates all the function prototypes for you.
+  We have put functions in other files so we need to manually add some prototypes as the automagic doesn't work correctly
 ********************************************************************************/
 void setup();
 
-//End Function Prototypes
+/********************************************************************************
+  End Function Prototypes
+********************************************************************************/
 
 
+/********************************************************************************
+  MAIN LOOP
+********************************************************************************/
 void loop() {
 
   //look for new transactions to arrive in wallet.
@@ -285,7 +300,7 @@ void loop() {
   }
 
 
-//no new transaction found.
+  //no new transaction found.
   else {
 
   }
