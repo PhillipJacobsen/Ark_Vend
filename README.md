@@ -15,7 +15,8 @@ Electronic Hardware Peripherals:
     
 <img src="TFTscreen.jpg" alt="240x320 TFT screen" width="250"/>    
 
-Description of the current program flow.  status/debug info is also regularly sent to serial terminal
+Description of the current program flow.  
+-status/debug info is also regularly sent to serial terminal
 1. configure peripherals
   -setup wifi and display connection status and IP address on TFT Screen
   -setup time sync with NTP server and display current time
