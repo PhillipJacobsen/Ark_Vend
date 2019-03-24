@@ -69,7 +69,7 @@ void setupQRcode() {
 
   //this will put the QRcode on the top left corner
   //  uint16_t x0 = 60;
-  uint16_t x0 = (Lcd_X - qrcode.size) / 4; //this will put the QRcode centered horizontally
+  uint16_t x0 = (Lcd_X - qrcode.size) / 4; //this will put the QRcode centered horizontally (DOES NOT WORK CORRECTLY!!!!)
   uint16_t y0 =  200;   //
   //--------------------------------------------
   //display QRcode
