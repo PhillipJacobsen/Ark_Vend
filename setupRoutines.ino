@@ -97,6 +97,28 @@ void setup()
   tft.setFont(&FreeSans9pt7b);
   // tft.setFont();    //standard font
 
+delay(300);
+  //--------------------------------------------
+  //Turn on all pixels so screen has a white background
+//  tft.fillScreen(ILI9341_WHITE);
+  //--------------------------------------------
+//  Turn on all pixels in the lower portion of the screen
+//   for (uint16_t x = 50; x < 239; x++) {
+//     for (uint16_t y = 90; y < 291; y++) {
+//       tft.drawPixel(x,y,ILI9341_WHITE);
+//       
+//     }
+//     delay(1);
+//   }
+//
+//  esp_deep_sleep_start();
+//  delay(3000);
+//  
+//  setupQRcode();
+
+
+  
+
   setupWiFi();  //configure WiFi connection
 
   setupTime();  //sync local time to NTP server
