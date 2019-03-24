@@ -126,8 +126,8 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
 
 #include <Fonts/FreeSans9pt7b.h>
 
-#define Lcd_X  128
-#define Lcd_Y  64
+#define Lcd_X  240
+#define Lcd_Y  320
 
 int CursorX = 0;
 int CursorY = 0;
@@ -201,8 +201,6 @@ int dst = 0;         //To enable Daylight saving time set it to 3600. Otherwise,
 #include <WiFi.h>
 
 /* This is the WiFi network you'd like your board to connect to. */
-//const char* ssid = "TELUS6428";
-//const char* password = "3mmkgc9gn2";
 const char* ssid = "TELUS0183";
 const char* password = "6z5g4hbdxi";
 /**/
@@ -224,9 +222,7 @@ void setup();
 
 void loop() {
 
-  setupQRcode();
-  esp_deep_sleep_start();
-  delay(3000);
+
 
 
   //look for new transactions to arrive in wallet.
@@ -301,8 +297,9 @@ void loop() {
 
   }
 
+  setupQRcode();
 
   delay(3000);
-  //  esp_deep_sleep_start();
+    esp_deep_sleep_start();
 
 };
