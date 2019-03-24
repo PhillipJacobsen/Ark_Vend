@@ -15,5 +15,12 @@ Electronic Hardware Peripherals:
     
 <img src="TFTscreen.jpg" alt="240x320 TFT screen" width="250"/>    
 
-    
-    
+Description of the current program flow.  status/debug info is also regularly sent to serial terminal
+1. configure peripherals
+  -setup wifi and display connection status and IP address on TFT Screen
+  -setup time sync with NTP server and display current time
+  -check to see if Ark node is synced and display status
+2. search through all received transactions on wallet. Wallet address is displayed
+  -"searching wallet + page#" will be displayed. text will toggle between red/white every received transaction
+3. # of transactions in wallet will be displayed
+4. QR code is displayed 
