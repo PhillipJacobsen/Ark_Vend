@@ -1,19 +1,36 @@
 /********************************************************************************
-  This file functions that interact with Ark client 
-code here is a hack right now. Just learning the API and working on basic program flow and function
+  This file contains functions that interact with Ark client C++ API
+  code here is a hack right now. Just learning the API and working on basic program flow and function
 ********************************************************************************/
 
 
+
+/********************************************************************************
+  This routine searches the block chain with receive address and page as input parameters
+  It returns details for 1 transaction if available.
+  Returns '0' if no transaction exist
+  returns parameters in
+  id -> transaction ID
+  amount -> amount of Arktoshi
+  senderAddress -> transaction sender address
+  vendorfield -> 64 Byte vendor field
+
+********************************************************************************/
 int searchReceivedTransaction(const char *const address, int page, const char* &id, int &amount, const char* &senderAddress, const char* &vendorField ) {
 
-  //Serial.print("\ntest address : ");
+  //Serial.print("\nSearch Received Address: ");
   //Serial.println(address);
+  //Serial.print("\nSearch page: ");
   //Serial.println(page );
 
   //const std::map<std::string, std::string>& body_parameters, int limit = 5,
   std::string vendorFieldHexString;
   vendorFieldHexString = "6964647955";
   //std::string transactionSearchResponse = connection.api.transactions.search( {{"vendorFieldHex", vendorFieldHexString}, {"orderBy", "timestamp:asc"} },1,1);
+
+  //--------------------------------------------
+  //peform the API
+  //sort by oldest transactions first.  For simplicity set limit = 1 so we only get 1 transaction returned
   std::string transactionSearchResponse = connection.api.transactions.search( {{"recipientId", address}, {"orderBy", "timestamp:asc"} }, 1, page);
   /**
      transactionSearchResponse return response is a json-formatted object
@@ -51,19 +68,22 @@ int searchReceivedTransaction(const char *const address, int page, const char* &
     }
   */
 
-
-
+  //--------------------------------------------
+  //  Print the entire return response string
   //  Serial.print("\nSearch Result Transactions: ");
   //  Serial.println(transactionSearchResponse.c_str()); // The response is a 'std::string', to Print on Arduino, we need the c_string type.
 
 
+  //--------------------------------------------
+  //  Deserialize the returned JSON
+  //  All of the returned parameters are parsed which is not necessary but may be usefull for testing.
   const size_t capacity = JSON_ARRAY_SIZE(1) + JSON_OBJECT_SIZE(2) + JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(8) + JSON_OBJECT_SIZE(11) + 810;
   DynamicJsonBuffer jsonBuffer(capacity);
 
+  //this is an exapmle of the JSON string that is returned
   //const char* json = "{\"meta\":{\"count\":1,\"pageCount\":16,\"totalCount\":16,\"next\":\"/api/v2/transactions/search?page=2&limit=1\",\"previous\":null,\"self\":\"/api/v2/transactions/search?page=1&limit=1\",\"first\":\"/api/v2/transactions/search?page=1&limit=1\",\"last\":\"/api/v2/transactions/search?page=16&limit=1\"},\"data\":[{\"id\":\"cf1aad5e14f4edb134269e0dc7f9457093f458a9785ea03914effa3932e7dffe\",\"blockId\":\"1196453921719185829\",\"version\":1,\"type\":0,\"amount\":1000000000,\"fee\":1000000,\"sender\":\"DFcWwEGwBaYCNb1wxGErGN1TJu8QdQYgCt\",\"recipient\":\"DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w\",\"signature\":\"3045022100d55a219edd8690e89a368399084aa8a468629b570e332e0e618e0af83b1a474602200f57b67e628389533b78db915b1139d8529fee133b9198576b30b98ea5a1ce28\",\"confirmations\":21771,\"timestamp\":{\"epoch\":62689306,\"unix\":1552790506,\"human\":\"2019-03-17T02:41:46.000Z\"}}]}";
 
   JsonObject& root = jsonBuffer.parseObject(transactionSearchResponse.c_str());
-
 
   JsonObject& meta = root["meta"];
   int meta_count = meta["count"]; // 1
@@ -93,9 +113,15 @@ int searchReceivedTransaction(const char *const address, int page, const char* &
   long data_0_timestamp_unix = data_0_timestamp["unix"]; // 1552363642
   const char* data_0_timestamp_human = data_0_timestamp["human"]; // "2019-03-12T04:07:22.000Z"
 
+  //--------------------------------------------
+  //  The meta parameters that are returned are currently not reliable and are "estimates". Apparently this is due to lower performance nodes
+  //  For this reason I will not use any of the meta parameters
+
+  //--------------------------------------------
+  //  the data_0_id parameter will be used to determine if a valid transaction was found.
   if (data_0_id == nullptr) {
     Serial.print("\n data_0_id is null");
-    return 0;
+    return 0;           //no transaction found
   }
   else {
     //   Serial.print("\n data_0_id is available");
@@ -104,7 +130,7 @@ int searchReceivedTransaction(const char *const address, int page, const char* &
     senderAddress = data_0_sender;
     vendorField = data_0_vendorField;
   }
-  return 1;
+  return 1;           //transaction found
 
 }
 
@@ -114,14 +140,16 @@ int searchReceivedTransaction(const char *const address, int page, const char* &
 
 
 
-
-/********************/
-void checkArkNodeStatus() {
+/********************************************************************************
+  This routine checks to see if Ark node is syncronized to the chain. 
+  This is a maybe a good way to see if node communication is working correctly.
+  This might be a good routine to run periodically  
+  Returns True if node is synced
+********************************************************************************/
+bool checkArkNodeStatus() {
   /**
      The following method can be used to get the Status of a Node.
-
      This is equivalant to calling '167.114.29.49:4003/api/v2/node/status'
-
      The response should be a json-formatted object
      The "pretty print" version would look something like this:
 
@@ -146,15 +174,9 @@ void checkArkNodeStatus() {
   bool data_synced = data["synced"]; // true
   //long data_now = data["now"]; // 1178395
   //int data_blocksCount = data["blocksCount"]; // 0
-
-  if (data_synced) {
-    Serial.print("\nNode is Synced: ");
-    tft.println("Ark Node is synced");
-  }
-  else {
-    Serial.print("\nNode is NOT Synced: ");
-    tft.println("Ark Node is NOT synced");
-  }
+  
+  return data_synced;   
+  
   /****************************************/
 }
 
