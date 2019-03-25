@@ -160,6 +160,10 @@ int port = 4003;
 const char* ArkAddress = "DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w";
 const char* ArkPublicKey = "029b2f577bd7afd878b258d791abfb379a6ea3c9436a73a77ad6a348ad48a5c0b9";
 
+//char *QRcodeArkAddress = "DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w";  //compiler may place this string in a location in memory that cannot be modified
+char QRcodeArkAddress[] = "DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w";
+
+
 /**
    This is how you define a connection while speficying the API class as a 'template argument'
    You instantiate a connection by passing a IP address as a 'c_string', and the port as an 'int'.
