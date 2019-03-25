@@ -2,7 +2,8 @@
 
 Proof of Concept Project -work in progress.  
 
-This projects illustrates a vending machine that accepts Ark Cryptocurrency for payment.(Not complete)
+This projects illustrates a vending machine that accepts Ark Cryptocurrency for payment.
+Basic program flow is working.
 
 Program Features: 
 This program has been tested with ESP32 Adafruit Huzzah however it should also work with ESP8266 modules with minor changes to hardware connections and wifi libraries.
