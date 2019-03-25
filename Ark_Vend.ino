@@ -17,15 +17,15 @@
 		Adafruit TFT FeatherWing 2.4" 320x240 Touchscreen
     Adafruit NeoPixels
 
-Description of the current program flow.  status/debug info is also regularly sent to serial terminal
-1. configure peripherals
+  Description of the current program flow.  status/debug info is also regularly sent to serial terminal
+  1. configure peripherals
   -setup wifi and display connection status and IP address on TFT Screen
   -setup time sync with NTP server and display current time
   -check to see if Ark node is synced and display status
-2. search through all received transactions on wallet. Wallet address is displayed
+  2. search through all received transactions on wallet. Wallet address is displayed
   -"searching wallet + page#" will be displayed. text will toggle between red/white every received transaction
-3. # of transactions in wallet will be displayed
-4. QR code is displayed 
+  3. # of transactions in wallet will be displayed
+  4. QR code is displayed
 
 ********************************************************************************/
 
@@ -163,6 +163,7 @@ const char* ArkPublicKey = "029b2f577bd7afd878b258d791abfb379a6ea3c9436a73a77ad6
 //char *QRcodeArkAddress = "DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w";  //compiler may place this string in a location in memory that cannot be modified
 char QRcodeArkAddress[] = "DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w";
 
+char VendorID[64];
 
 /**
    This is how you define a connection while speficying the API class as a 'template argument'
@@ -247,6 +248,7 @@ void loop() {
   //look for new transactions to arrive in wallet.
   Serial.print("\n\n\nLooking for new transaction\n");
 
+  delay(1500);
 
   searchRXpage = lastRXpage + 1;
   if ( searchReceivedTransaction(ArkAddress, searchRXpage, id, amount, senderAddress, vendorField) ) {
@@ -262,6 +264,19 @@ void loop() {
     Serial.println(senderAddress);
     Serial.print("Vendor Field: ");
     Serial.println(vendorField);
+
+
+    if  (strcmp(vendorField, VendorID) == 0) {
+      Serial.println("thanks for the payment!");
+      tft.setTextColor(ILI9341_GREEN);
+      tft.print("Payment:");
+      tft.println(VendorID);
+      //    u8g2.clearBuffer();
+      //    u8g2.drawStr(0, 12, "Turn LED ON");  // write text string to the internal memory of OLED; (x coordinate, y coordinate, string)
+      //   u8g2.sendBuffer();                    // transfer internal memory to the display
+    }
+
+
 
     //   if (vendorField == "LED ON") {
     if  (strcmp(vendorField, "led on") == 0) {
@@ -316,9 +331,9 @@ void loop() {
 
   }
 
-  setupQRcode();
 
-  delay(3000);
-  esp_deep_sleep_start();
+
+
+  //  esp_deep_sleep_start();
 
 };
