@@ -13,7 +13,7 @@ Ark API documentation:  https://docs.ark.io/sdk/clients/usage.html
 Electronic Hardware Peripherals:
 	Adafruit TFT FeatherWing 2.4" 320x240 Touchscreen
     
-<img src="TFTscreen.jpg" alt="240x320 TFT screen" width="250"/>    
+<img src="TFTscreen2.jpg" alt="240x320 TFT screen" width="250"/>    
 
 Description of the current program flow.  
 -status/debug info is also regularly sent to serial terminal
@@ -24,4 +24,6 @@ Description of the current program flow.
 2. search through all received transactions on wallet. Wallet address is displayed
   -"searching wallet + page#" will be displayed. text will toggle between red/white every received transaction
 3. number of transactions in wallet will be displayed
-4. QR code is displayed 
+4. QR code with Vendor field = "ArkVend_(random number)" is generated
+5. wallet is continually checked waiting for transaction with vendor field to be received.
+6. If payment is received then it will display in green text "Payment: ArkVend_(random_number)"
