@@ -5,15 +5,14 @@
 
 void setupQRcode() {
 
-#define _240x320_TFT
-
-
 
   //  tft.fillScreen(ILI9341_BLACK);
   //  tft.setTextColor(ILI9341_WHITE);
   // tft.setCursor(0, 32);
   //  tft.setTextSize(2);  //(30 pixels tall I think)
-  tft.println("Generating QR Code");
+ 
+  //tft.println("Generating QR Code");
+  //tft.println("Pay 0.3 dArk by scanning the QR code");
 
   //--------------------------------------------
   // Allocate memory to store the QR code.
@@ -22,6 +21,11 @@ void setupQRcode() {
 
 
 
+  //Serial.println(esp_random()); //this is pseudorandom when the wifi or bluetooth does not have a connection. It can be considered "random" when the radios have a connection
+  //Serial.println(random(256,32768));  //arduino random function is overloaded on to esp_random();  this provides a lower and upper bound
+  
+//uint32_t esprandom = (random(256,32768));
+
   // Start time
   uint32_t dt = millis();
 
@@ -29,28 +33,35 @@ void setupQRcode() {
   //configure the text string to code
   //https://github.com/ArkEcosystem/AIPs/blob/master/AIPS/aip-13.md#simpler-syntax
   // Address with label, amount and vendor field
-  // dark:DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w?label=PJ&amount=0.3&vendorField=color%red
+  // dark:DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w?label=PJ&amount=0.3&vendorField=ArkVend%123456789
 
 
   //qrcode_initText(&qrcode, qrcodeData, QRcode_Version, QRcode_ECC, "ark:AePNZAAtWhLsGFLXtztGLAPnKm98VVC8tJ?amount=10.3");    //ARK address
   //  qrcode_initText(&qrcode, qrcodeData, QRcode_Version, QRcode_ECC, "dark:DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w?amount=0.3");    //dARK address 51 bytes.
-  qrcode_initText(&qrcode, qrcodeData, QRcode_Version, QRcode_ECC, "dark:DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w?label=ArkVend&amount=0.3&vendorField=color red");    //dARK address 51 bytes.
+//  qrcode_initText(&qrcode, qrcodeData, QRcode_Version, QRcode_ECC, "dark:DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w?label=ArkVend&amount=0.3&vendorField=color red");    //dARK address 51 bytes.
 
 
-  //--------------------------------------------
-  // Print Code Generation Time
-  //  dt = millis() - dt;
-  //  Serial.print("QR Code Generation Time: ");
-  //  Serial.print(dt);
-  //  Serial.print("\n");
-  //
-  //  tft.setCursor(0, 60);
-  //  tft.setTextSize(1);  //(20 pixels tall I think)
-  //  tft.println();
-  //  tft.print("Generation Time(ms)");
-  //  tft.println(dt);
-  //  delay(3000);
+int esprandom = (random(256,32768));
+String str = String(esprandom);     //int is now a string
+char charBuf[6];
+str.toCharArray(charBuf,6); 
 
+char QRdata[150];
+
+strcpy(QRdata,"dark:");
+strcat(QRdata,QRcodeArkAddress);
+strcat(QRdata,"?label=ArkVend&amount=0.3&vendorField=ArkVend_");
+strcat(QRdata,charBuf);
+Serial.println(QRdata);
+
+strcpy(VendorID,"ArkVend_");
+strcat(VendorID,charBuf);
+
+tft.print("VendorField: ");
+tft.println(VendorID);
+
+
+qrcode_initText(&qrcode, qrcodeData, QRcode_Version, QRcode_ECC, QRdata );    //dARK address 51 bytes.
 
 
 
@@ -59,8 +70,8 @@ void setupQRcode() {
 //  tft.fillScreen(ILI9341_WHITE);
   //--------------------------------------------
 //  Turn on all pixels in the lower portion of the screen
-   for (uint16_t y = 180; y < 320; y++) {
-     for (uint16_t x = 0; x < 240; x++) {
+   for (uint16_t y = 200; y < 320; y++) {
+     for (uint16_t x = 0; x < 170; x++) {
        tft.drawPixel(x,y,ILI9341_WHITE);
      }
    }
@@ -73,9 +84,10 @@ void setupQRcode() {
 
 
   //this will put the QRcode on the top left corner
-  //  uint16_t x0 = 60;
-  uint16_t x0 = (Lcd_X - qrcode.size) / 4; //this will put the QRcode centered horizontally (DOES NOT WORK CORRECTLY!!!!)
-  uint16_t y0 =  200;   //
+    uint16_t x0 = 30;
+  //uint16_t x0 = (Lcd_X - qrcode.size) / 4; //this will put the QRcode centered horizontally (DOES NOT WORK CORRECTLY!!!!)
+  
+  uint16_t y0 =  210;   //
   //--------------------------------------------
   //display QRcode
   for (uint16_t y = 0; y < qrcode.size; y++) {

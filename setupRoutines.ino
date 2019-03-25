@@ -99,6 +99,31 @@ void setup()
 {
   Serial.begin(115200);         // Initialize Serial Connection for debug / display
 
+
+  //Serial.println(QRcodeArkAddress);
+  //strcat(QRcodeArkAddress,"happy");
+  //Serial.println(QRcodeArkAddress);
+  //int esprandom = (random(256,32768));
+  //Serial.println("test string");
+  //String str = String(esprandom);     //int is now a string
+  //Serial.println(str);
+  //char charBuf[6];
+  //str.toCharArray(charBuf,6);
+  //strcat(QRcodeArkAddress,charBuf);
+  //Serial.println(QRcodeArkAddress);
+
+
+
+
+  //qrcode_initText(&qrcode, qrcodeData, QRcode_Version, QRcode_ECC, "dark:DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w?label=ArkVend&amount=0.3&vendorField=color red");    //dARK address 51 bytes.
+
+
+
+
+  //  delay(3000);
+  //  esp_deep_sleep_start();
+
+
   //--------------------------------------------
   //  setup 240x320 TFT display with custom font and clear screen
   // tft.setFont();    //configure standard adafruit font
@@ -159,6 +184,8 @@ void setup()
   tft.print("# of transactions in wallet: ");
   tft.println(lastRXpage);          //this is the page number of the last received transaction. This is also the total number of transactions in the wallet
 
+
+  setupQRcode();
 
   //--------------------------------------------
   //  System is now configured! Set Neo Pixels to Green
