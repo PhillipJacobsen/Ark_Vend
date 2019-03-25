@@ -254,6 +254,7 @@ void loop() {
 
   searchRXpage = lastRXpage + 1;
   if ( searchReceivedTransaction(ArkAddress, searchRXpage, id, amount, senderAddress, vendorField) ) {
+    //a new transaction has been received.
     Serial.print("Page: ");
     Serial.println(searchRXpage);
     Serial.print("Transaction id: ");
@@ -267,62 +268,37 @@ void loop() {
     Serial.print("Vendor Field: ");
     Serial.println(vendorField);
 
-
+    //check to see if vendorField of new transaction matches the field in QRcode that we displayed
     if  (strcmp(vendorField, VendorID) == 0) {
       Serial.println("thanks for the payment!");
       tft.setTextColor(ILI9341_GREEN);
       tft.print("Payment:");
       tft.println(VendorID);
-      //    u8g2.clearBuffer();
-      //    u8g2.drawStr(0, 12, "Turn LED ON");  // write text string to the internal memory of OLED; (x coordinate, y coordinate, string)
-      //   u8g2.sendBuffer();                    // transfer internal memory to the display
     }
 
 
-
-    //   if (vendorField == "LED ON") {
     if  (strcmp(vendorField, "led on") == 0) {
-
-      //    u8g2.clearBuffer();
-      //    u8g2.drawStr(0, 12, "Turn LED ON");  // write text string to the internal memory of OLED; (x coordinate, y coordinate, string)
-      //   u8g2.sendBuffer();                    // transfer internal memory to the display
     }
-    // else if (vendorField == "led off") {
+
     else if  (strcmp(vendorField, "led off") == 0) {
-      //    u8g2.clearBuffer();
-      //    u8g2.drawStr(0, 12, "LEDs OFF");  // write text string to the internal memory of OLED; (x coordinate, y coordinate, string)
-      //    u8g2.sendBuffer();                    // transfer internal memory to the display
       ConfigureNeoPixels(off);
     }
-    //  else if (vendorField == "color red") {
+
     else if  (strcmp(vendorField, "color red") == 0) {
-      //   u8g2.clearBuffer();
-      //   u8g2.drawStr(0, 12, "Glowing Red");  // write text string to the internal memory of OLED; (x coordinate, y coordinate, string)
-      //   u8g2.sendBuffer();                    // transfer internal memory to the display
       ConfigureNeoPixels(red);
     }
-    //    else if (vendorField == "color green") {
+
     else if  (strcmp(vendorField, "color green") == 0) {
-      //   u8g2.clearBuffer();
-      //   u8g2.drawStr(0, 12, "Glowing green");  // write text string to the internal memory of OLED; (x coordinate, y coordinate, string)
-      //   u8g2.sendBuffer();                    // transfer internal memory to the display
+
       ConfigureNeoPixels(green);
     }
-    //     else if (vendorField == "color blue") {
+
     else if  (strcmp(vendorField, "color blue") == 0) {
-      //   u8g2.clearBuffer();
-      //   u8g2.drawStr(0, 12, "Glowing blue");  // write text string to the internal memory of OLED; (x coordinate, y coordinate, string)
-      //    u8g2.sendBuffer();                    // transfer internal memory to the display
       ConfigureNeoPixels(blue);
     }
 
     else {
-      //   u8g2.clearBuffer();
-      //   u8g2.setCursor(0, 12);
       Serial.print("Unspecified VendorField: ");
-      //   u8g2.print(vendorField);           // display unknown vendor field
-      //   u8g2.sendBuffer();                    // transfer internal memory to the display
-
     }
     lastRXpage++;
   }
