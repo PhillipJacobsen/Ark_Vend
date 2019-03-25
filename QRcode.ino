@@ -70,7 +70,7 @@ qrcode_initText(&qrcode, qrcodeData, QRcode_Version, QRcode_ECC, QRdata );    //
 //  tft.fillScreen(ILI9341_WHITE);
   //--------------------------------------------
 //  Turn on all pixels in the lower portion of the screen
-   for (uint16_t y = 200; y < 320; y++) {
+   for (uint16_t y = 205; y < 320; y++) {
      for (uint16_t x = 0; x < 170; x++) {
        tft.drawPixel(x,y,ILI9341_WHITE);
      }
@@ -84,10 +84,10 @@ qrcode_initText(&qrcode, qrcodeData, QRcode_Version, QRcode_ECC, QRdata );    //
 
 
   //this will put the QRcode on the top left corner
-    uint16_t x0 = 30;
+    uint16_t x0 = 33;
   //uint16_t x0 = (Lcd_X - qrcode.size) / 4; //this will put the QRcode centered horizontally (DOES NOT WORK CORRECTLY!!!!)
   
-  uint16_t y0 =  210;   //
+  uint16_t y0 =  213;   //
   //--------------------------------------------
   //display QRcode
   for (uint16_t y = 0; y < qrcode.size; y++) {
