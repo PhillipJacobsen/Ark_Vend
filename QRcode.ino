@@ -45,19 +45,23 @@ int esprandom = (random(256,32768));
 String str = String(esprandom);     //int is now a string
 char charBuf[6];
 str.toCharArray(charBuf,6); 
-char VendorID[150];
 
-strcpy(VendorID,"dark:");
-strcat(VendorID,QRcodeArkAddress);
-strcat(VendorID,"?label=ArkVend&amount=0.3&vendorField=ArkVend_");
+char QRdata[150];
+
+strcpy(QRdata,"dark:");
+strcat(QRdata,QRcodeArkAddress);
+strcat(QRdata,"?label=ArkVend&amount=0.3&vendorField=ArkVend_");
+strcat(QRdata,charBuf);
+Serial.println(QRdata);
+
+strcpy(VendorID,"ArkVend_");
 strcat(VendorID,charBuf);
-Serial.println(VendorID);
 
-tft.print("VendorField: ArkVend_");
-tft.println(charBuf);
+tft.print("VendorField: ");
+tft.println(VendorID);
 
 
-qrcode_initText(&qrcode, qrcodeData, QRcode_Version, QRcode_ECC, VendorID );    //dARK address 51 bytes.
+qrcode_initText(&qrcode, qrcodeData, QRcode_Version, QRcode_ECC, QRdata );    //dARK address 51 bytes.
 
 
 
