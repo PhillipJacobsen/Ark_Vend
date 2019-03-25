@@ -120,7 +120,7 @@ int searchReceivedTransaction(const char *const address, int page, const char* &
   //--------------------------------------------
   //  the data_0_id parameter will be used to determine if a valid transaction was found.
   if (data_0_id == nullptr) {
-    Serial.print("\n data_0_id is null");
+    Serial.println("\n data_0_id is null");
     return 0;           //no transaction found
   }
   else {
@@ -243,6 +243,7 @@ int getMostRecentReceivedTransaction() {
       //We need to clear the pixels around the page number every time we refresh.
     }
     page++;
+    yield();
   };
   tft.setCursor(CursorXtemp, CursorYtemp);
   tft.setTextColor(ILI9341_BLACK);
