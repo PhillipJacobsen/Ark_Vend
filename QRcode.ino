@@ -10,7 +10,7 @@ void setupQRcode() {
   //  tft.setTextColor(ILI9341_WHITE);
   // tft.setCursor(0, 32);
   //  tft.setTextSize(2);  //(30 pixels tall I think)
- 
+
   //tft.println("Generating QR Code");
   //tft.println("Pay 0.3 dArk by scanning the QR code");
 
@@ -21,10 +21,9 @@ void setupQRcode() {
 
 
 
-  //Serial.println(esp_random()); //this is pseudorandom when the wifi or bluetooth does not have a connection. It can be considered "random" when the radios have a connection
-  //Serial.println(random(256,32768));  //arduino random function is overloaded on to esp_random();  this provides a lower and upper bound
-  
-//uint32_t esprandom = (random(256,32768));
+
+
+  //uint32_t esprandom = (random(256,32768));
 
   // Start time
   uint32_t dt = millis();
@@ -38,43 +37,54 @@ void setupQRcode() {
 
   //qrcode_initText(&qrcode, qrcodeData, QRcode_Version, QRcode_ECC, "ark:AePNZAAtWhLsGFLXtztGLAPnKm98VVC8tJ?amount=10.3");    //ARK address
   //  qrcode_initText(&qrcode, qrcodeData, QRcode_Version, QRcode_ECC, "dark:DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w?amount=0.3");    //dARK address 51 bytes.
-//  qrcode_initText(&qrcode, qrcodeData, QRcode_Version, QRcode_ECC, "dark:DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w?label=ArkVend&amount=0.3&vendorField=color red");    //dARK address 51 bytes.
+  //  qrcode_initText(&qrcode, qrcodeData, QRcode_Version, QRcode_ECC, "dark:DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w?label=ArkVend&amount=0.3&vendorField=color red");    //dARK address 51 bytes.
 
 
-int esprandom = (random(256,32768));
-String str = String(esprandom);     //int is now a string
-char charBuf[6];
-str.toCharArray(charBuf,6); 
+  //Serial.println(esp_random()); //this is pseudorandom when the wifi or bluetooth does not have a connection. It can be considered "random" when the radios have a connection
+  //Serial.println(random(256,32768));  //arduino random function is overloaded on to esp_random();  this provides a lower and upper bound
 
-char QRdata[150];
+  //--------------------------------------------
+  //this is pseudorandom when the wifi or bluetooth does not have a connection. It can be considered "random" when the radios have a connection
+  //arduino random function is overloaded on to esp_random();  
+  int esprandom = (random(256, 16777216));    //generate random number with a lower and upper bound
+  //Is this the best way to convert int to char?
+  String str = String(esprandom);     //int is now a string
+  char charBuf[10];
+  str.toCharArray(charBuf, 10);
 
-strcpy(QRdata,"dark:");
-strcat(QRdata,QRcodeArkAddress);
-strcat(QRdata,"?label=ArkVend&amount=0.3&vendorField=ArkVend_");
-strcat(QRdata,charBuf);
-Serial.println(QRdata);
+  char QRdata[200];     //what is the maximum size for the QRcode string?
 
-strcpy(VendorID,"ArkVend_");
-strcat(VendorID,charBuf);
+  strcpy(QRdata, "dark:");
+  strcat(QRdata, QRcodeArkAddress);
+  strcat(QRdata, "?label=ArkVend&amount=0.3&vendorField=");
+ 
+  strcpy(VendorID, "ArkVend_");
+  strcat(VendorID, charBuf);      //append random number to the end of the vendorID
 
-tft.print("VendorField: ");
-tft.println(VendorID);
+  strcat(QRdata, VendorID);
+  //strcat(QRdata, charBuf);
+  Serial.println(QRdata);
 
 
-qrcode_initText(&qrcode, qrcodeData, QRcode_Version, QRcode_ECC, QRdata );    //dARK address 51 bytes.
+
+  tft.print("Vendor: ");
+  tft.println(VendorID);
+
+
+  qrcode_initText(&qrcode, qrcodeData, QRcode_Version, QRcode_ECC, QRdata );    //dARK address 51 bytes.
 
 
 
   //--------------------------------------------
   //Turn on all pixels so screen has a white background
-//  tft.fillScreen(ILI9341_WHITE);
+  //  tft.fillScreen(ILI9341_WHITE);
   //--------------------------------------------
-//  Turn on all pixels in the lower portion of the screen
-   for (uint16_t y = 205; y < 320; y++) {
-     for (uint16_t x = 0; x < 170; x++) {
-       tft.drawPixel(x,y,ILI9341_WHITE);
-     }
-   }
+  //  Turn on all pixels in the lower portion of the screen
+  for (uint16_t y = 205; y < 320; y++) {
+    for (uint16_t x = 0; x < 170; x++) {
+      tft.drawPixel(x, y, ILI9341_WHITE);
+    }
+  }
 
   //--------------------------------------------
   //this will put the QRcode in the middle of the screen
@@ -84,9 +94,9 @@ qrcode_initText(&qrcode, qrcodeData, QRcode_Version, QRcode_ECC, QRdata );    //
 
 
   //this will put the QRcode on the top left corner
-    uint16_t x0 = 33;
+  uint16_t x0 = 33;
   //uint16_t x0 = (Lcd_X - qrcode.size) / 4; //this will put the QRcode centered horizontally (DOES NOT WORK CORRECTLY!!!!)
-  
+
   uint16_t y0 =  213;   //
   //--------------------------------------------
   //display QRcode
