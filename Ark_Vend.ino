@@ -159,11 +159,14 @@ int CursorY = 0;         //used to store current cursor position of the display
 const char* peer = "167.114.29.55";
 int port = 4003;
 
-const char* ArkAddress = "DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w";
+//const char* ArkAddress = "DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w";
+const char* ArkAddress = "DFcWwEGwBaYCNb1wxGErGN1TJu8QdQYgCt";
 const char* ArkPublicKey = "029b2f577bd7afd878b258d791abfb379a6ea3c9436a73a77ad6a348ad48a5c0b9";
 
 //char *QRcodeArkAddress = "DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w";  //compiler may place this string in a location in memory that cannot be modified
-char QRcodeArkAddress[] = "DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w";
+
+//char QRcodeArkAddress[] = "DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w";
+char QRcodeArkAddress[] = "DFcWwEGwBaYCNb1wxGErGN1TJu8QdQYgCt";
 
 char VendorID[64];
 
