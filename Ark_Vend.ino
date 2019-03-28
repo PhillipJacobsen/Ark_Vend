@@ -119,22 +119,41 @@ QRCode qrcode;                  // Create the QR code
 
 
 /********************************************************************************
-  GFX libraries for the Adafruit ILI9341 2.4" 240x320 TFT FeatherWing
+  GFX libraries for the Adafruit ILI9341 2.4" 240x320 TFT FeatherWing display + touchscreen
   ----> http://www.adafruit.com/products/3315
 ********************************************************************************/
 #include <SPI.h>
 #include <Adafruit_GFX.h>
-#include <Adafruit_ILI9341.h>
+#include <Adafruit_ILI9341.h>       //hardware specific library for display
+#include <Adafruit_STMPE610.h>      //hardware specific library for the touch sensor
 
 #ifdef ESP32
-#define STMPE_CS 32
-#define TFT_CS   15
-#define TFT_DC   33
-#define SD_CS    14
+  #define STMPE_CS 32
+  #define TFT_CS   15
+  #define TFT_DC   33
+  #define SD_CS    14
+#endif
+#ifdef ESP8266
+   #define STMPE_CS 16
+   #define TFT_CS   0
+   #define TFT_DC   15
+   #define SD_CS    2
 #endif
 
-Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
+
+Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);    //create TFT display object
+Adafruit_STMPE610 ts = Adafruit_STMPE610(STMPE_CS);         //create Touchscreen object
 #include <Fonts/FreeSans9pt7b.h>        //add custom fonts here
+
+// This is calibration data for the raw touch data to the screen coordinates
+#define TS_MINX 3800
+#define TS_MAXX 100
+#define TS_MINY 100
+#define TS_MAXY 3750
+
+
+#define MINPRESSURE 10
+#define MAXPRESSURE 1000
 
 #define Lcd_X  240       //configure your screen dimensions.  We aren't using an LCD for this project so I should rename to something more generic               
 #define Lcd_Y  320       //configure your screen dimensions    
