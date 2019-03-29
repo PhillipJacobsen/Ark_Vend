@@ -146,11 +146,23 @@ Adafruit_STMPE610 ts = Adafruit_STMPE610(STMPE_CS);         //create Touchscreen
 #include <Fonts/FreeSans9pt7b.h>        //add custom fonts here
 
 // This is calibration data for the raw touch data to the screen coordinates
-#define TS_MINX 3800
-#define TS_MAXX 100
-#define TS_MINY 100
+//#define TS_MINX 3800
+//#define TS_MAXX 100
+//#define TS_MINY 100
+//#define TS_MAXY 3750
+
+//my calibrated touchscreen data
+#define TS_MINX 3800  //affect left side of screen
+#define TS_MAXX 250   //affect right side of screen.
+#define TS_MINY 205   //
 #define TS_MAXY 3750
 
+//  use these tools to get 16bit hex color definitions  "5-6-5 16-bit mode"
+//  http://www.barth-dev.de/online/rgb565-color-picker/
+//  http://henrysbench.capnfatz.com/henrys-bench/arduino-adafruit-gfx-library-user-guide/arduino-16-bit-tft-rgb565-color-basics-and-selection/
+
+#define ArkRed 0xF1A7       // rgb(241, 55, 58)
+#define ArkLightRed 0xFCD3  // rgb(248, 155, 156)
 
 #define MINPRESSURE 10
 #define MAXPRESSURE 1000
