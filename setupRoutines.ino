@@ -123,6 +123,12 @@ void setup()
   //  delay(3000);
   //  esp_deep_sleep_start();
 
+    delay(12);
+  if (!ts.begin()) {
+    Serial.println("Couldn't start touchscreen controller");
+    while (1);
+  }
+  Serial.println("Touchscreen started");
 
   //--------------------------------------------
   //  setup 240x320 TFT display with custom font and clear screen
@@ -130,6 +136,38 @@ void setup()
   tft.begin();
   tft.fillScreen(ILI9341_BLACK);  //clear screen
   tft.setFont(&FreeSans9pt7b);
+
+    Serial.println("drawing stuff"); 
+
+  drawHomeScreen();
+      Serial.println("finished home screen"); 
+
+  while (true==true) {
+ //   Serial.println("while loop"); 
+    // Retrieve a point
+    TS_Point p = ts.getPoint();
+
+//    Serial.print("X = "); Serial.print(p.x);
+ //   Serial.print("\tY = "); Serial.print(p.y);
+//    Serial.print("\tPressure = "); Serial.println(p.z);
+
+
+    // Scale from ~0->4000 to tft.width using the calibration #'s
+    p.x = map(p.x, TS_MINX, TS_MAXX, 0, 240);
+    p.y = map(p.y, TS_MINY, TS_MAXY, 0, 320);
+
+    p.x = constrain(p.x, 0, 240);
+    p.y = constrain(p.y, 0, 320);
+
+    Serial.print("X = "); Serial.print(p.x);
+    Serial.print("\tY = "); Serial.print(p.y);
+    Serial.print("\tPressure = "); Serial.println(p.z);
+
+    delay(200);
+  }
+
+  delay(3000);
+  esp_deep_sleep_start();
 
   //--------------------------------------------
   //  Configure NeoPixels.
