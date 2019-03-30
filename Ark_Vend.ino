@@ -284,7 +284,7 @@ void loop() {
   //look for new transactions to arrive in wallet.
   Serial.print("\n\n\nLooking for new transaction\n");
 
-  delay(1500);
+  delay(1000);
 
   searchRXpage = lastRXpage + 1;
   if ( searchReceivedTransaction(ArkAddress, searchRXpage, id, amount, senderAddress, vendorField) ) {
