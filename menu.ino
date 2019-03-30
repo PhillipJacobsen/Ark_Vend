@@ -34,7 +34,7 @@ void drawHomeScreen()
   //X, Y pair for the top-left corner of the rectangle, a width and height (in pixels), and a color
 
   tft.fillScreen(ILI9341_BLACK);
-  tft.drawRoundRect(0, 0, 240, 320, 6, ILI9341_WHITE);     //Screen border
+  tft.drawRoundRect(0, 0, 239, 319, 6, ILI9341_WHITE);     //Screen border
   tft.setTextColor(ILI9341_WHITE);
   tft.setCursor(9, 25);
   tft.println("Ark Vending Machine Demo");
