@@ -1,7 +1,19 @@
-
 bool checkPaymentTimer() {
+  timeNow = millis();  //get current time
+  if ((timeNow > payment_Timeout)) {
+
+    return true;
+  }
+  Serial.print("timeout: ");
+  Serial.println ((payment_Timeout - timeNow)/1000);
+  tft.fillRect(150, 95, 80, 18, ILI9341_BLACK);     //delete the previous time
+  tft.setCursor(150, 110);
+  tft.setTextColor(ILI9341_RED);
+  tft.println((payment_Timeout - timeNow)/1000);
+
   return false;
 }
+
 
 bool search_newRX() {
 }
@@ -39,8 +51,14 @@ void ArkVendingMachine() {         //The Vending state machine
         if (handleTouchscreenV2()) {       //check if touchscreen has been pressed
           Serial.print("button was pushed. display QRcode now");
           promptForPayment();
+          timeNow = millis();  //get current time
+          payment_Timeout = timeNow + PAYMENT_WAIT_TIME;
+
+          tft.setCursor(0, 110);
+          tft.setTextColor(ILI9341_RED);
+          tft.println("Payment Timeout");
           vmState = WAIT_FOR_PAY;               //WAIT_FOR_PAY
- 
+
           break;
         }
 
@@ -62,15 +80,16 @@ void ArkVendingMachine() {         //The Vending state machine
           Serial.println(vendorField);
 
           //check to see if vendorField of new transaction matches the field in QRcode that we displayed
-          if  (strcmp(vendorField, VendorID) == 0) {      
+          if  (strcmp(vendorField, VendorID) == 0) {
             Serial.println("Thanks for the payment!");
-            tft.setCursor(0, 100);
-            tft.setTextColor(ILI9341_GREEN); 
+            tft.fillRoundRect(0, 160, 150, 150, 2, ILI9341_BLACK);     //remove the QRcode
+            tft.setCursor(0, 180);
+            tft.setTextColor(ILI9341_GREEN);
             tft.println("Thanks for the payment");
             tft.print("Vendor:");
             tft.println(VendorID);
             tft.println("Enjoy the candy!");
-            
+
             lastRXpage++;
             vmState = VEND_ITEM;            //State is now VEND_ITEM
             break;                          //Get out of switch
