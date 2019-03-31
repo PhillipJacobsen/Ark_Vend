@@ -5,15 +5,17 @@ bool checkPaymentTimer() {
     return true;
   }
   Serial.print("timeout: ");
-  Serial.println ((payment_Timeout - timeNow)/1000);
+  Serial.println ((payment_Timeout - timeNow) / 1000);
   tft.fillRect(150, 95, 80, 18, ILI9341_BLACK);     //delete the previous time
   tft.setCursor(150, 110);
   tft.setTextColor(ILI9341_RED);
-  tft.println((payment_Timeout - timeNow)/1000);
+  tft.println((payment_Timeout - timeNow) / 1000);
 
   return false;
 }
 
+bool checkCancelButton() {
+}
 
 bool search_newRX() {
 }
@@ -36,14 +38,26 @@ void ArkVendingMachine() {         //The Vending state machine
         //check to see if new new transaction has been received in wallet
         searchRXpage = lastRXpage + 1;
         if ( searchReceivedTransaction(ArkAddress, searchRXpage, id, amount, senderAddress, vendorField) ) {
+          //a new unknown transaction has been received.
           lastRXpage++;
-          //a new transaction has been received.
           Serial.print("Page: ");
           Serial.println(searchRXpage);
           Serial.print("Transaction id: ");
           Serial.println(id);
           Serial.print("Vendor Field: ");
           Serial.println(vendorField);
+
+          tft.fillRect(2, 240, 227, 65, ILI9341_BLACK);     //clear the bottom portion of the screen
+          tft.setCursor(4, 250);
+          tft.setTextColor(ILI9341_RED);
+          tft.println("New Transaction in Wallet");
+          tft.setCursor(4, 270);         
+          tft.print("Page: ");
+          tft.println(searchRXpage);  
+          tft.setCursor(4, 290);      
+          tft.print("Vendor Field: ");
+          tft.println(vendorField);
+
           vmState = WAIT_FOR_USER;     //stay in the same state
           break;
         }
@@ -72,6 +86,7 @@ void ArkVendingMachine() {         //The Vending state machine
         searchRXpage = lastRXpage + 1;
         if ( searchReceivedTransaction(ArkAddress, searchRXpage, id, amount, senderAddress, vendorField) ) {
           //a new transaction has been received.
+          lastRXpage++;
           Serial.print("Page: ");
           Serial.println(searchRXpage);
           Serial.print("Transaction id: ");
@@ -89,21 +104,27 @@ void ArkVendingMachine() {         //The Vending state machine
             tft.print("Vendor:");
             tft.println(VendorID);
             tft.println("Enjoy the candy!");
-
-            lastRXpage++;
             vmState = VEND_ITEM;            //State is now VEND_ITEM
-            break;                          //Get out of switch
+            break;
+
           }
-          else {
-            vmState = WAIT_FOR_PAY;           //
-            break;                            //Get out of switch
+          else {                            //transaction with incorrect vendor field received
+            vmState = WAIT_FOR_PAY;         //stay in the current state
+            break;
           }
         }
 
-        if (checkPaymentTimer()) {        //check to see if time has expired before payment has been received
-          vmState = DRAW_HOME;             //timer has elapsed without receiving payment. go back to start of state machine
-          break;                          //Get out of switch
+        //check to see if time has expired before payment has been received
+        if (checkPaymentTimer()) {          
+          vmState = DRAW_HOME;              //timer has elapsed without receiving payment. go back to start of state machine
+          break;
         }
+
+        //check to see if cancel button was pressed
+//        if (checkCancelButton()) {          
+//          vmState = DRAW_HOME;              //cancel button was pressed. Go back to start of state machine
+//          break;
+//        }
 
 
         vmState = WAIT_FOR_PAY;     //stay in the same state
@@ -112,7 +133,7 @@ void ArkVendingMachine() {         //The Vending state machine
 
 
     case VEND_ITEM: {
-        delay(12000);
+        delay(10000);
         vmState = DRAW_HOME;             //State is now DROP_CAN
         break;                          //Get out of switch
       }
