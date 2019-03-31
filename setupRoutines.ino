@@ -195,7 +195,7 @@ void setup()
   tft.println(lastRXpage);          //this is the page number of the last received transaction. This is also the total number of transactions in the wallet
 
 
-  setupQRcode();
+//  setupQRcode();
 
   //--------------------------------------------
   //  System is now configured! Set Neo Pixels to Green
