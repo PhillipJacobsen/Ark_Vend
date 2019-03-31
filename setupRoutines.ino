@@ -2,7 +2,32 @@
   This file contains functions used to configure hardware perhipherals and various libraries.
 ********************************************************************************/
 
+/********************************************************************************
+  This routine configures the display and touchscreen
+********************************************************************************/
+void setupDisplayTouchscreen() {
 
+  //--------------------------------------------
+  //  setup 240x320 TFT display with custom font and clear screen
+  // tft.setFont();    //configure standard adafruit font
+  tft.begin();
+  tft.fillScreen(ILI9341_BLACK);  //clear screen
+  tft.setFont(&FreeSans9pt7b);
+
+
+  //--------------------------------------------
+  // setup touchscreencontroller.
+  // NOTE:  When I push the reset button sometimes the controller does not start. I am not sure why. Perhaps there is a reset sequence on the control lines that should be implemented
+  delay(300);
+  if (!ts.begin()) {
+    Serial.println("Couldn't start touchscreen controller");
+    while (1);
+  }
+  Serial.println("Touchscreen started");
+
+
+
+}
 
 /********************************************************************************
   This routine waits for a connection to your WiFi network according to "ssid" and "password" defined previously
@@ -100,137 +125,21 @@ void setup()
   Serial.begin(115200);         // Initialize Serial Connection for debug / display
   while ( !Serial && millis() < 20 );
 
-  //Serial.println(QRcodeArkAddress);
-  //strcat(QRcodeArkAddress,"happy");
-  //Serial.println(QRcodeArkAddress);
-  //int esprandom = (random(256,32768));
-  //Serial.println("test string");
-  //String str = String(esprandom);     //int is now a string
-  //Serial.println(str);
-  //char charBuf[6];
-  //str.toCharArray(charBuf,6);
-  //strcat(QRcodeArkAddress,charBuf);
-  //Serial.println(QRcodeArkAddress);
 
-
-
-
-  //qrcode_initText(&qrcode, qrcodeData, QRcode_Version, QRcode_ECC, "dark:DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w?label=ArkVend&amount=0.3&vendorField=color red");    //dARK address 51 bytes.
-
-
+  setupDisplayTouchscreen();
 
 
   //  delay(3000);
   //  esp_deep_sleep_start();
-
-  delay(300);
-  if (!ts.begin()) {
-    Serial.println("Couldn't start touchscreen controller");
-    while (1);
-  }
-  Serial.println("Touchscreen started");
-
-  //--------------------------------------------
-  //  setup 240x320 TFT display with custom font and clear screen
-  // tft.setFont();    //configure standard adafruit font
-  tft.begin();
-  tft.fillScreen(ILI9341_BLACK);  //clear screen
-  tft.setFont(&FreeSans9pt7b);
-
-  Serial.println("drawing stuff");
 
   drawHomeScreen();
   Serial.println("finished home screen");
 
   while (true) {
     // Retrieve a point
-
-    if (ts.touched()) {
-      TS_Point p = ts.getPoint(); //read raw touchscreen data from buffer
-      //  delay(5);
-      //p = ts.getPoint();
-
-      //    Serial.print("X = "); Serial.print(p.x);
-      //   Serial.print("\tY = "); Serial.print(p.y);
-      //    Serial.print("\tPressure = "); Serial.println(p.z);
-
-
-      // Scale from ~0->4000 to tft.width using the calibration #'s
-      p.x = map(p.x, TS_MINX, TS_MAXX, 0, 239);
-      p.y = map(p.y, TS_MINY, TS_MAXY, 0, 319);
-
-      p.x = constrain(p.x, 0, 239);
-      p.y = constrain(p.y, 0, 319);
-
-      Serial.print("X = "); Serial.print(p.x);
-      Serial.print("\tY = "); Serial.print(p.y);
-      Serial.print("\tPressure = "); Serial.println(p.z);
-
-      //NOTE: We are not currently checking pressure data for points
-
-      //check for M&Ms button being pressed
-      if (p.x > 30 && p.x < (30 + 130) && p.y > 70 && p.y < (70 + 40))   {
-        tft.fillRoundRect(30, 70, 130, 40, 7, ArkLightRed);     //M&Ms
-        tft.setCursor(70, 95);
-        tft.print("M&Ms");
-        delay(50);
-        while (ts.touched()) {}       //wait until screen is no longer being touched
-        while (!ts.bufferEmpty()) {
-          p = ts.getPoint();          //empty buffer
-        }
-        tft.fillRoundRect(30, 70, 130, 40, 7, ArkRed);     //M&Ms
-        tft.drawRoundRect(30, 70, 130, 40, 7, ILI9341_WHITE);
-        tft.setTextColor(ILI9341_BLACK);
-        tft.setCursor(70, 95);
-        tft.print("M&Ms");
-        Serial.println("Selected M&Ms");
-      }
-
-      //check for smarties button being pressed
-      else if (p.x > 30 && p.x < (30 + 130) && p.y > 120 && p.y < (120 + 40))   {
-        tft.fillRoundRect(30, 120, 130, 40, 7, ArkLightRed);
-        tft.setCursor(60, 145);
-        tft.print("Smarties");
-        delay(50);
-        while (ts.touched()) {}       //wait until screen is no longer being touched
-        while (!ts.bufferEmpty()) {
-          p = ts.getPoint();          //empty buffer
-        }
-        tft.fillRoundRect(30, 120, 130, 40, 7, ArkRed);
-        tft.drawRoundRect(30, 120, 130, 40, 7, ILI9341_WHITE);
-        tft.setTextColor(ILI9341_BLACK);
-        tft.setCursor(70, 95);
-        tft.setCursor(60, 145);
-        tft.print("Smarties");
-        Serial.println("Selected Smarties");
-      }
-
-      //check for skittles button being pressed
-      else if (p.x > 30 && p.x < (30 + 130) && p.y > 170 && p.y < (170 + 40))   {
-        tft.fillRoundRect(30, 170, 130, 40, 7, ArkLightRed);
-        tft.setCursor(67, 195);
-        tft.print("Skittles");
-        delay(50);
-        while (ts.touched()) {}       //wait until screen is no longer being touched
-        while (!ts.bufferEmpty()) {
-          p = ts.getPoint();          //empty buffer
-        }
-        tft.fillRoundRect(30, 170, 130, 40, 7, ArkRed);
-        tft.drawRoundRect(30, 170, 130, 40, 7, ILI9341_WHITE);
-        tft.setTextColor(ILI9341_BLACK);
-        tft.setCursor(67, 195);
-        tft.print("Skittles");
-        Serial.println("Selected Skittles");
-      }
-
-
-
-
-    }
-
-
-    delay(10);
+    handleTouchscreen();
   }
+
 
   delay(3000);
   esp_deep_sleep_start();
