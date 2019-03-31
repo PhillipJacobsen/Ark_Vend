@@ -131,11 +131,13 @@ void setup()
   setupDisplayTouchscreen();    //
 
 
-  drawHomeScreen();
+//  drawHomeScreen();
 
-  while (true) {
-    handleTouchscreen();
-  }
+//  while (true) {
+//    handleTouchscreen();
+//  }
+
+  
 //  delay(3000);
 //  esp_deep_sleep_start();
 
@@ -198,5 +200,7 @@ void setup()
   //--------------------------------------------
   //  System is now configured! Set Neo Pixels to Green
   ConfigureNeoPixels(redgreen);
+
+  delay(2000);
 
 }
