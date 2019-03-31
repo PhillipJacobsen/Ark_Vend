@@ -4,6 +4,9 @@
 
 /********************************************************************************
   This routine configures the display and touchscreen
+  There is also LITE pin which is not connected to any pads but you can use to control the backlight. Pull low to turn off the backlight. You can connect it to a PWM output pin.
+  There is also an IRQ pin which is not connected to any pads but you can use to detect when touch events have occured.
+  There is also an Card Detect (CD) pin which is not connected to any pads but you can use to detect when a microSD card has been inserted have occured. It will be shorted to ground when a card is not inserted.
 ********************************************************************************/
 void setupDisplayTouchscreen() {
 
@@ -24,8 +27,6 @@ void setupDisplayTouchscreen() {
     while (1);
   }
   Serial.println("Touchscreen started");
-
-
 
 }
 
@@ -125,24 +126,18 @@ void setup()
   Serial.begin(115200);         // Initialize Serial Connection for debug / display
   while ( !Serial && millis() < 20 );
 
+  //--------------------------------------------
+  //configure the 2.4" TFT display and the touchscreen controller
+  setupDisplayTouchscreen();    //
 
-  setupDisplayTouchscreen();
-
-
-  //  delay(3000);
-  //  esp_deep_sleep_start();
 
   drawHomeScreen();
-  Serial.println("finished home screen");
 
   while (true) {
-    // Retrieve a point
     handleTouchscreen();
   }
-
-
-  delay(3000);
-  esp_deep_sleep_start();
+//  delay(3000);
+//  esp_deep_sleep_start();
 
   //--------------------------------------------
   //  Configure NeoPixels.
