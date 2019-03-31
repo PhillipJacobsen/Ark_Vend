@@ -201,6 +201,8 @@ char QRcodeArkAddress[] = "DFcWwEGwBaYCNb1wxGErGN1TJu8QdQYgCt";
 
 char VendorID[64];
 
+#define PAYMENT_WAIT_TIME 90000
+
 /**
    This is how you define a connection while speficying the API class as a 'template argument'
    You instantiate a connection by passing a IP address as a 'c_string', and the port as an 'int'.
@@ -248,6 +250,10 @@ int searchRXpage;           //page number that is used for wallet search
 //#include <TimeLib.h>    //https://github.com/PaulStoffregen/Time
 int timezone = -6;        //set your timezone MST
 int dst = 0;              //To enable Daylight saving time set it to 3600. Otherwise, set it to 0. This doesn't seem to work.
+
+
+unsigned long timeNow;  //variable used to hold current millis() time.
+unsigned long payment_Timeout;
 
 
 /********************************************************************************
