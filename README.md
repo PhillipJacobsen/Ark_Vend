@@ -14,7 +14,9 @@ Ark API documentation:  https://docs.ark.io/sdk/clients/usage.html
 Electronic Hardware Peripherals:
 	Adafruit TFT FeatherWing 2.4" 320x240 Touchscreen
     
-<img src="TFTscreen2.jpg" alt="240x320 TFT screen" width="250"/>    
+<img src="TFTscreen2.jpg" alt="240x320 TFT screen" width="250"/>      <img src="ArkVendHomeScreen.jpg" alt="240x320 TFT screen" width="250"/>    
+
+
 
 Description of the current program flow.  
 -status/debug info is also regularly sent to serial terminal
