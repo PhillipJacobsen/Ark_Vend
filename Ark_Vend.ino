@@ -128,16 +128,16 @@ QRCode qrcode;                  // Create the QR code
 #include <Adafruit_STMPE610.h>      //hardware specific library for the touch sensor
 
 #ifdef ESP32
-  #define STMPE_CS 32
-  #define TFT_CS   15
-  #define TFT_DC   33
-  #define SD_CS    14
+#define STMPE_CS 32
+#define TFT_CS   15
+#define TFT_DC   33
+#define SD_CS    14
 #endif
 #ifdef ESP8266
-   #define STMPE_CS 16
-   #define TFT_CS   0
-   #define TFT_DC   15
-   #define SD_CS    2
+#define STMPE_CS 16
+#define TFT_CS   0
+#define TFT_DC   15
+#define SD_CS    2
 #endif
 
 
@@ -266,7 +266,7 @@ const char* password = "6z5g4hbdxi";
 
 /********************************************************************************
   State Machine
-  
+
 ********************************************************************************/
 enum VendingMachineStates {DRAW_HOME, WAIT_FOR_USER, WAIT_FOR_PAY, VEND_ITEM};   //The five possible states of the Vending state machine
 VendingMachineStates vmState = DRAW_HOME;   //initialize the starting state.
@@ -280,6 +280,7 @@ VendingMachineStates vmState = DRAW_HOME;   //initialize the starting state.
 void setup();
 int searchReceivedTransaction(const char *const address, int page, const char* &id, int &amount, const char* &senderAddress, const char* &vendorField );
 void ConfigureNeoPixels(RgbColor color);
+void ArkVendingMachine();
 /********************************************************************************
   End Function Prototypes
 ********************************************************************************/
@@ -289,6 +290,11 @@ void ConfigureNeoPixels(RgbColor color);
   MAIN LOOP
 ********************************************************************************/
 void loop() {
+  ArkVendingMachine();
+}
+
+/*
+  void loop() {
 
   //look for new transactions to arrive in wallet.
   Serial.print("\n\n\nLooking for new transaction\n");
@@ -296,7 +302,8 @@ void loop() {
   delay(1000);
 
   searchRXpage = lastRXpage + 1;
-  if ( searchReceivedTransaction(ArkAddress, searchRXpage, id, amount, senderAddress, vendorField) ) {      
+  if ( searchReceivedTransaction(ArkAddress, searchRXpage, id, amount, senderAddress, vendorField) ) {
+
     //a new transaction has been received.
     Serial.print("Page: ");
     Serial.println(searchRXpage);
@@ -352,9 +359,5 @@ void loop() {
 
   }
 
-
-
-
-  //  esp_deep_sleep_start();
-
-};
+  };
+*/
