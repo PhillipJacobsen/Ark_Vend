@@ -265,12 +265,21 @@ const char* password = "6z5g4hbdxi";
 
 
 /********************************************************************************
+  State Machine
+  
+********************************************************************************/
+enum VendingMachineStates {DRAW_HOME, WAIT_FOR_USER, WAIT_FOR_PAY, VEND_ITEM};   //The five possible states of the Vending state machine
+VendingMachineStates vmState = DRAW_HOME;   //initialize the starting state.
+
+
+/********************************************************************************
   Function prototypes
   Arduino IDE normally does its automagic here and creates all the function prototypes for you.
   We have put functions in other files so we need to manually add some prototypes as the automagic doesn't work correctly
 ********************************************************************************/
 void setup();
-
+int searchReceivedTransaction(const char *const address, int page, const char* &id, int &amount, const char* &senderAddress, const char* &vendorField );
+void ConfigureNeoPixels(RgbColor color);
 /********************************************************************************
   End Function Prototypes
 ********************************************************************************/
@@ -287,7 +296,7 @@ void loop() {
   delay(1000);
 
   searchRXpage = lastRXpage + 1;
-  if ( searchReceivedTransaction(ArkAddress, searchRXpage, id, amount, senderAddress, vendorField) ) {
+  if ( searchReceivedTransaction(ArkAddress, searchRXpage, id, amount, senderAddress, vendorField) ) {      
     //a new transaction has been received.
     Serial.print("Page: ");
     Serial.println(searchRXpage);
