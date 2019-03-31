@@ -25,6 +25,8 @@ Description of the current program flow.
 2. search through all received transactions on wallet. Wallet address is displayed
   -"searching wallet + page#" will be displayed. text will toggle between red/white every received transaction
 3. number of transactions in wallet will be displayed
-4. QR code with Vendor field = "ArkVend_(random number)" is generated
-5. wallet is continually checked waiting for transaction with vendor field to be received.
-6. If payment is received then it will display in green text "Payment: ArkVend_(random_number)"
+4. home screen displayed with option to select 3 products (only first product does something right now)
+5. select "M&Ms" and QRcode will be displayed.  Timer will start
+6. If timer expires then transaction is cancelled and home screen is displayed
+7. If payment is received then it will display the received vendor field and display success
+8. Go back to step 4
