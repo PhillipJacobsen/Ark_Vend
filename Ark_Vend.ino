@@ -119,12 +119,13 @@ QRCode qrcode;                  // Create the QR code
 
 
 /********************************************************************************
-  GFX libraries for the Adafruit ILI9341 2.4" 240x320 TFT FeatherWing
+  GFX libraries for the Adafruit ILI9341 2.4" 240x320 TFT FeatherWing display + touchscreen
   ----> http://www.adafruit.com/products/3315
 ********************************************************************************/
 #include <SPI.h>
 #include <Adafruit_GFX.h>
-#include <Adafruit_ILI9341.h>
+#include <Adafruit_ILI9341.h>       //hardware specific library for display
+#include <Adafruit_STMPE610.h>      //hardware specific library for the touch sensor
 
 #ifdef ESP32
 #define STMPE_CS 32
@@ -132,9 +133,39 @@ QRCode qrcode;                  // Create the QR code
 #define TFT_DC   33
 #define SD_CS    14
 #endif
+#ifdef ESP8266
+#define STMPE_CS 16
+#define TFT_CS   0
+#define TFT_DC   15
+#define SD_CS    2
+#endif
 
-Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);
+
+Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);    //create TFT display object
+Adafruit_STMPE610 ts = Adafruit_STMPE610(STMPE_CS);         //create Touchscreen object
 #include <Fonts/FreeSans9pt7b.h>        //add custom fonts here
+
+// This is calibration data for the raw touch data to the screen coordinates
+//#define TS_MINX 3800
+//#define TS_MAXX 100
+//#define TS_MINY 100
+//#define TS_MAXY 3750
+
+//my calibrated touchscreen data
+#define TS_MINX 3800  //affect left side of screen
+#define TS_MAXX 250   //affect right side of screen.
+#define TS_MINY 205   //
+#define TS_MAXY 3750
+
+//  use these tools to get 16bit hex color definitions  "5-6-5 16-bit mode"
+//  http://www.barth-dev.de/online/rgb565-color-picker/
+//  http://henrysbench.capnfatz.com/henrys-bench/arduino-adafruit-gfx-library-user-guide/arduino-16-bit-tft-rgb565-color-basics-and-selection/
+
+#define ArkRed 0xF1A7       // rgb(241, 55, 58)
+#define ArkLightRed 0xFCD3  // rgb(248, 155, 156)
+
+#define MINPRESSURE 10
+#define MAXPRESSURE 1000
 
 #define Lcd_X  240       //configure your screen dimensions.  We aren't using an LCD for this project so I should rename to something more generic               
 #define Lcd_Y  320       //configure your screen dimensions    
@@ -159,13 +190,18 @@ int CursorY = 0;         //used to store current cursor position of the display
 const char* peer = "167.114.29.55";
 int port = 4003;
 
-const char* ArkAddress = "DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w";
+//const char* ArkAddress = "DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w";
+const char* ArkAddress = "DFcWwEGwBaYCNb1wxGErGN1TJu8QdQYgCt";
 const char* ArkPublicKey = "029b2f577bd7afd878b258d791abfb379a6ea3c9436a73a77ad6a348ad48a5c0b9";
 
 //char *QRcodeArkAddress = "DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w";  //compiler may place this string in a location in memory that cannot be modified
-char QRcodeArkAddress[] = "DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w";
+
+//char QRcodeArkAddress[] = "DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w";
+char QRcodeArkAddress[] = "DFcWwEGwBaYCNb1wxGErGN1TJu8QdQYgCt";
 
 char VendorID[64];
+
+#define PAYMENT_WAIT_TIME 90000
 
 /**
    This is how you define a connection while speficying the API class as a 'template argument'
@@ -216,6 +252,10 @@ int timezone = -6;        //set your timezone MST
 int dst = 0;              //To enable Daylight saving time set it to 3600. Otherwise, set it to 0. This doesn't seem to work.
 
 
+unsigned long timeNow;  //variable used to hold current millis() time.
+unsigned long payment_Timeout;
+
+
 /********************************************************************************
   WiFi Library
   If using the ESP8266 I believe you will need to #include <ESP8266WiFi.h> instead of WiFi.h
@@ -231,12 +271,22 @@ const char* password = "6z5g4hbdxi";
 
 
 /********************************************************************************
+  State Machine
+
+********************************************************************************/
+enum VendingMachineStates {DRAW_HOME, WAIT_FOR_USER, WAIT_FOR_PAY, VEND_ITEM};   //The five possible states of the Vending state machine
+VendingMachineStates vmState = DRAW_HOME;   //initialize the starting state.
+
+
+/********************************************************************************
   Function prototypes
   Arduino IDE normally does its automagic here and creates all the function prototypes for you.
   We have put functions in other files so we need to manually add some prototypes as the automagic doesn't work correctly
 ********************************************************************************/
 void setup();
-
+int searchReceivedTransaction(const char *const address, int page, const char* &id, int &amount, const char* &senderAddress, const char* &vendorField );
+void ConfigureNeoPixels(RgbColor color);
+void ArkVendingMachine();
 /********************************************************************************
   End Function Prototypes
 ********************************************************************************/
@@ -246,14 +296,20 @@ void setup();
   MAIN LOOP
 ********************************************************************************/
 void loop() {
+  ArkVendingMachine();
+}
+
+/*
+  void loop() {
 
   //look for new transactions to arrive in wallet.
   Serial.print("\n\n\nLooking for new transaction\n");
 
-  delay(1500);
+  delay(1000);
 
   searchRXpage = lastRXpage + 1;
   if ( searchReceivedTransaction(ArkAddress, searchRXpage, id, amount, senderAddress, vendorField) ) {
+
     //a new transaction has been received.
     Serial.print("Page: ");
     Serial.println(searchRXpage);
@@ -309,9 +365,5 @@ void loop() {
 
   }
 
-
-
-
-  //  esp_deep_sleep_start();
-
-};
+  };
+*/

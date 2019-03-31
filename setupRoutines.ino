@@ -2,7 +2,33 @@
   This file contains functions used to configure hardware perhipherals and various libraries.
 ********************************************************************************/
 
+/********************************************************************************
+  This routine configures the display and touchscreen
+  There is also LITE pin which is not connected to any pads but you can use to control the backlight. Pull low to turn off the backlight. You can connect it to a PWM output pin.
+  There is also an IRQ pin which is not connected to any pads but you can use to detect when touch events have occured.
+  There is also an Card Detect (CD) pin which is not connected to any pads but you can use to detect when a microSD card has been inserted have occured. It will be shorted to ground when a card is not inserted.
+********************************************************************************/
+void setupDisplayTouchscreen() {
 
+  //--------------------------------------------
+  //  setup 240x320 TFT display with custom font and clear screen
+  // tft.setFont();    //configure standard adafruit font
+  tft.begin();
+  tft.fillScreen(ILI9341_BLACK);  //clear screen
+  tft.setFont(&FreeSans9pt7b);
+
+
+  //--------------------------------------------
+  // setup touchscreencontroller.
+  // NOTE:  When I push the reset button sometimes the controller does not start. I am not sure why. Perhaps there is a reset sequence on the control lines that should be implemented
+  delay(300);
+  if (!ts.begin()) {
+    Serial.println("Couldn't start touchscreen controller");
+    while (1);
+  }
+  Serial.println("Touchscreen started");
+
+}
 
 /********************************************************************************
   This routine waits for a connection to your WiFi network according to "ssid" and "password" defined previously
@@ -98,38 +124,22 @@ void ConfigureNeoPixels(RgbColor color) {
 void setup()
 {
   Serial.begin(115200);         // Initialize Serial Connection for debug / display
-
-
-  //Serial.println(QRcodeArkAddress);
-  //strcat(QRcodeArkAddress,"happy");
-  //Serial.println(QRcodeArkAddress);
-  //int esprandom = (random(256,32768));
-  //Serial.println("test string");
-  //String str = String(esprandom);     //int is now a string
-  //Serial.println(str);
-  //char charBuf[6];
-  //str.toCharArray(charBuf,6);
-  //strcat(QRcodeArkAddress,charBuf);
-  //Serial.println(QRcodeArkAddress);
-
-
-
-
-  //qrcode_initText(&qrcode, qrcodeData, QRcode_Version, QRcode_ECC, "dark:DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w?label=ArkVend&amount=0.3&vendorField=color red");    //dARK address 51 bytes.
-
-
-
-
-  //  delay(3000);
-  //  esp_deep_sleep_start();
-
+  while ( !Serial && millis() < 20 );
 
   //--------------------------------------------
-  //  setup 240x320 TFT display with custom font and clear screen
-  // tft.setFont();    //configure standard adafruit font
-  tft.begin();
-  tft.fillScreen(ILI9341_BLACK);  //clear screen
-  tft.setFont(&FreeSans9pt7b);
+  //configure the 2.4" TFT display and the touchscreen controller
+  setupDisplayTouchscreen();    //
+
+
+//  drawHomeScreen();
+
+//  while (true) {
+//    handleTouchscreen();
+//  }
+
+  
+//  delay(3000);
+//  esp_deep_sleep_start();
 
   //--------------------------------------------
   //  Configure NeoPixels.
@@ -185,10 +195,12 @@ void setup()
   tft.println(lastRXpage);          //this is the page number of the last received transaction. This is also the total number of transactions in the wallet
 
 
-  setupQRcode();
+//  setupQRcode();
 
   //--------------------------------------------
   //  System is now configured! Set Neo Pixels to Green
   ConfigureNeoPixels(redgreen);
+
+  delay(2000);
 
 }
