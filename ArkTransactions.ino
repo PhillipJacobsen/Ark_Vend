@@ -120,7 +120,8 @@ int searchReceivedTransaction(const char *const address, int page, const char* &
   //--------------------------------------------
   //  the data_0_id parameter will be used to determine if a valid transaction was found.
   if (data_0_id == nullptr) {
-    Serial.println("\n data_0_id is null");
+    //   Serial.println("\n data_0_id is null");
+    Serial.print(".");
     return 0;           //no transaction found
   }
   else {
@@ -141,9 +142,9 @@ int searchReceivedTransaction(const char *const address, int page, const char* &
 
 
 /********************************************************************************
-  This routine checks to see if Ark node is syncronized to the chain. 
+  This routine checks to see if Ark node is syncronized to the chain.
   This is a maybe a good way to see if node communication is working correctly.
-  This might be a good routine to run periodically  
+  This might be a good routine to run periodically
   Returns True if node is synced
 ********************************************************************************/
 bool checkArkNodeStatus() {
@@ -174,9 +175,9 @@ bool checkArkNodeStatus() {
   bool data_synced = data["synced"]; // true
   //long data_now = data["now"]; // 1178395
   //int data_blocksCount = data["blocksCount"]; // 0
-  
-  return data_synced;   
-  
+
+  return data_synced;
+
   /****************************************/
 }
 
@@ -187,9 +188,9 @@ bool checkArkNodeStatus() {
 /********************************************************************************
   This routine will search through all the received transactions of ArkAddress wallet starting from the oldest.
   "searching wallet + page#" will be displayed. text will toggle between red/white every received transaction
-  The page number of the last transaction in the search will be displayed. 
+  The page number of the last transaction in the search will be displayed.
   This is the page to the most newest receive transaction on the chain.
-  The final page number is also equal to the total number of received transactions in the wallet. 
+  The final page number is also equal to the total number of received transactions in the wallet.
 
   The routine returns the page number of the most recent transaction.
   Empty wallet will return '0' (NOT YET TESTED)
