@@ -39,20 +39,20 @@ void drawHomeScreen()
   tft.setCursor(9, 25);
   tft.println("Ark Vending Machine Demo");
   tft.setTextColor(ArkRed);
-  tft.setCursor(33, 50);  
-  tft.println("Select a Candy");  
+  tft.setCursor(33, 50);
+  tft.println("Select a Candy");
 
-//create buttons
+  //create buttons
   tft.fillRoundRect(30, 70, 130, 40, 7, ArkRed);     //M&Ms
-  tft.drawRoundRect(30, 70, 130, 40, 7, ILI9341_WHITE); 
-  
+  tft.drawRoundRect(30, 70, 130, 40, 7, ILI9341_WHITE);
+
   tft.fillRoundRect(30, 120, 130, 40, 7, ArkRed);    //Smarties
   tft.drawRoundRect(30, 120, 130, 40, 7, ILI9341_WHITE);
-  
-  tft.fillRoundRect(30, 170, 130, 40, 7, ArkRed);    //Skittles
-  tft.drawRoundRect(30, 170, 130, 40, 7, ILI9341_WHITE);  
 
-//create button text
+  tft.fillRoundRect(30, 170, 130, 40, 7, ArkRed);    //Skittles
+  tft.drawRoundRect(30, 170, 130, 40, 7, ILI9341_WHITE);
+
+  //create button text
   tft.setTextColor(ILI9341_BLACK);
 
   tft.setCursor(70, 95);
@@ -65,4 +65,89 @@ void drawHomeScreen()
   tft.print("Skittles");
 
 
+}
+
+
+
+void handleTouchscreen()
+{
+  if (ts.touched()) {
+    TS_Point p = ts.getPoint(); //read raw touchscreen data from buffer
+    //  delay(5);
+    //p = ts.getPoint();
+
+    //    Serial.print("X = "); Serial.print(p.x);
+    //   Serial.print("\tY = "); Serial.print(p.y);
+    //    Serial.print("\tPressure = "); Serial.println(p.z);
+
+
+    // Scale from ~0->4000 to tft.width using the calibration #'s
+    p.x = map(p.x, TS_MINX, TS_MAXX, 0, 239);
+    p.y = map(p.y, TS_MINY, TS_MAXY, 0, 319);
+
+    p.x = constrain(p.x, 0, 239);
+    p.y = constrain(p.y, 0, 319);
+
+    Serial.print("X = "); Serial.print(p.x);
+    Serial.print("\tY = "); Serial.print(p.y);
+    Serial.print("\tPressure = "); Serial.println(p.z);
+
+    //NOTE: We are not currently checking pressure data for points
+
+    //check for M&Ms button being pressed
+    if (p.x > 30 && p.x < (30 + 130) && p.y > 70 && p.y < (70 + 40))   {
+      tft.fillRoundRect(30, 70, 130, 40, 7, ArkLightRed);     //M&Ms
+      tft.setCursor(70, 95);
+      tft.print("M&Ms");
+      delay(50);
+      while (ts.touched()) {}       //wait until screen is no longer being touched
+      while (!ts.bufferEmpty()) {
+        p = ts.getPoint();          //empty buffer
+      }
+      tft.fillRoundRect(30, 70, 130, 40, 7, ArkRed);     //M&Ms
+      tft.drawRoundRect(30, 70, 130, 40, 7, ILI9341_WHITE);
+      tft.setTextColor(ILI9341_BLACK);
+      tft.setCursor(70, 95);
+      tft.print("M&Ms");
+      Serial.println("Selected M&Ms");
+    }
+
+    //check for smarties button being pressed
+    else if (p.x > 30 && p.x < (30 + 130) && p.y > 120 && p.y < (120 + 40))   {
+      tft.fillRoundRect(30, 120, 130, 40, 7, ArkLightRed);
+      tft.setCursor(60, 145);
+      tft.print("Smarties");
+      delay(50);
+      while (ts.touched()) {}       //wait until screen is no longer being touched
+      while (!ts.bufferEmpty()) {
+        p = ts.getPoint();          //empty buffer
+      }
+      tft.fillRoundRect(30, 120, 130, 40, 7, ArkRed);
+      tft.drawRoundRect(30, 120, 130, 40, 7, ILI9341_WHITE);
+      tft.setTextColor(ILI9341_BLACK);
+      tft.setCursor(70, 95);
+      tft.setCursor(60, 145);
+      tft.print("Smarties");
+      Serial.println("Selected Smarties");
+    }
+
+    //check for skittles button being pressed
+    else if (p.x > 30 && p.x < (30 + 130) && p.y > 170 && p.y < (170 + 40))   {
+      tft.fillRoundRect(30, 170, 130, 40, 7, ArkLightRed);
+      tft.setCursor(67, 195);
+      tft.print("Skittles");
+      delay(50);
+      while (ts.touched()) {}       //wait until screen is no longer being touched
+      while (!ts.bufferEmpty()) {
+        p = ts.getPoint();          //empty buffer
+      }
+      tft.fillRoundRect(30, 170, 130, 40, 7, ArkRed);
+      tft.drawRoundRect(30, 170, 130, 40, 7, ILI9341_WHITE);
+      tft.setTextColor(ILI9341_BLACK);
+      tft.setCursor(67, 195);
+      tft.print("Skittles");
+      Serial.println("Selected Skittles");
+    }
+  }
+  delay(10);
 }
