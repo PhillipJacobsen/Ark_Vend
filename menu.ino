@@ -64,7 +64,7 @@ void drawHomeScreen()
   tft.setCursor(67, 195);
   tft.print("Skittles");
 
-
+  Serial.println("finished drawing home screen");
 }
 
 
