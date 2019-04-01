@@ -6,8 +6,8 @@ bool checkPaymentTimer() {
   }
   Serial.print("timeout: ");
   Serial.println ((payment_Timeout - timeNow) / 1000);
-  tft.fillRect(150, 95, 80, 18, ILI9341_BLACK);     //delete the previous time
-  tft.setCursor(150, 110);
+  tft.fillRect(150, 75, 80, 18, ILI9341_BLACK);     //delete the previous time
+  tft.setCursor(150, 90);
   tft.setTextColor(ILI9341_RED);
   tft.println((payment_Timeout - timeNow) / 1000);
 
@@ -51,10 +51,10 @@ void ArkVendingMachine() {         //The Vending state machine
           tft.setCursor(4, 250);
           tft.setTextColor(ILI9341_RED);
           tft.println("New Transaction in Wallet");
-          tft.setCursor(4, 270);         
+          tft.setCursor(4, 270);
           tft.print("Page: ");
-          tft.println(searchRXpage);  
-          tft.setCursor(4, 290);      
+          tft.println(searchRXpage);
+          tft.setCursor(4, 290);
           tft.print("Vendor Field: ");
           tft.println(vendorField);
 
@@ -68,11 +68,11 @@ void ArkVendingMachine() {         //The Vending state machine
           timeNow = millis();  //get current time
           payment_Timeout = timeNow + PAYMENT_WAIT_TIME;
 
-          tft.setCursor(0, 110);
+          tft.setCursor(0, 90);
           tft.setTextColor(ILI9341_RED);
           tft.println("Payment Timeout");
           vmState = WAIT_FOR_PAY;               //WAIT_FOR_PAY
-
+          cancelButton();
           break;
         }
 
@@ -97,7 +97,7 @@ void ArkVendingMachine() {         //The Vending state machine
           //check to see if vendorField of new transaction matches the field in QRcode that we displayed
           if  (strcmp(vendorField, VendorID) == 0) {
             Serial.println("Thanks for the payment!");
-            tft.fillRoundRect(0, 160, 150, 150, 2, ILI9341_BLACK);     //remove the QRcode
+            tft.fillRoundRect(0, 150, 150, 169, 2, ILI9341_BLACK);     //remove the QRcode
             tft.setCursor(0, 180);
             tft.setTextColor(ILI9341_GREEN);
             tft.println("Thanks for the payment");
@@ -109,22 +109,26 @@ void ArkVendingMachine() {         //The Vending state machine
 
           }
           else {                            //transaction with incorrect vendor field received
+            tft.fillRect(0, 150, 239, 20, ILI9341_BLACK);     //clear the area
+            tft.setCursor(0, 165);
+            tft.setTextColor(ILI9341_RED);
+            tft.println("Invalid Vendor Received");
             vmState = WAIT_FOR_PAY;         //stay in the current state
             break;
           }
         }
 
         //check to see if time has expired before payment has been received
-        if (checkPaymentTimer()) {          
+        if (checkPaymentTimer()) {
           vmState = DRAW_HOME;              //timer has elapsed without receiving payment. go back to start of state machine
           break;
         }
 
         //check to see if cancel button was pressed
-//        if (checkCancelButton()) {          
-//          vmState = DRAW_HOME;              //cancel button was pressed. Go back to start of state machine
-//          break;
-//        }
+        if (handleTouchScreenWaitForPayment()) {
+          vmState = DRAW_HOME;              //cancel button was pressed. Go back to start of state machine
+          break;
+        }
 
 
         vmState = WAIT_FOR_PAY;     //stay in the same state
