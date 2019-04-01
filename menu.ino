@@ -69,6 +69,58 @@ void drawHomeScreen()
 
 
 
+void cancelButton() {
+  tft.fillRoundRect(30, 100, 80, 40, 7, ArkRed);     //M&Ms
+  tft.drawRoundRect(30, 100, 80, 40, 7, ILI9341_WHITE);
+
+  //create button text
+  tft.setTextColor(ILI9341_BLACK);
+  tft.setCursor(42, 124);
+  tft.print("Cancel");
+
+}
+
+
+bool handleTouchScreenWaitForPayment()
+{
+  if (ts.touched()) {
+    TS_Point p = ts.getPoint(); //read raw touchscreen data from buffer
+    // Scale from ~0->4000 to tft.width using the calibration #'s
+    p.x = map(p.x, TS_MINX, TS_MAXX, 0, 239);
+    p.y = map(p.y, TS_MINY, TS_MAXY, 0, 319);
+
+    p.x = constrain(p.x, 0, 239);
+    p.y = constrain(p.y, 0, 319);
+
+    Serial.print("X = "); Serial.print(p.x);
+    Serial.print("\tY = "); Serial.print(p.y);
+    Serial.print("\tPressure = "); Serial.println(p.z);
+
+    //NOTE: We are not currently checking pressure data for points
+
+    //check for cancel button being pressed
+    if (p.x > 30 && p.x < (30 + 80) && p.y > 100 && p.y < (100 + 40))   {
+      tft.fillRoundRect(30, 100, 80, 40, 7, ArkLightRed);     //cancel button
+      tft.setCursor(70, 95);
+      tft.setTextColor(ILI9341_BLACK);
+      tft.setCursor(42, 124);
+      tft.print("Cancel");
+      delay(50);
+      while (ts.touched()) {}       //wait until screen is no longer being touched
+      while (!ts.bufferEmpty()) {
+        p = ts.getPoint();          //empty buffer
+      }
+      Serial.println("cancelled");
+       return true;
+    }
+   return false;
+  }
+  return false;
+}
+
+
+
+
 void handleTouchscreen()
 {
   if (ts.touched()) {
@@ -149,7 +201,7 @@ void handleTouchscreen()
       Serial.println("Selected Skittles");
     }
   }
-  delay(10);
+  // delay(10);
 }
 
 
