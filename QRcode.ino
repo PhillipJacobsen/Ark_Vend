@@ -54,7 +54,7 @@ void setupQRcode() {
 
   strcpy(QRdata, "dark:");
   strcat(QRdata, QRcodeArkAddress);
-  strcat(QRdata, "?label=ArkVend&amount=0.3&vendorField=");
+  strcat(QRdata, "?label=ArkVend&amount=0.1&vendorField=");
 
   strcpy(VendorID, "ArkVend_");
   strcat(VendorID, charBuf);      //append random number to the end of the vendorID
@@ -140,13 +140,11 @@ void setupQRcode() {
 
 
 
-
-
 void promptForPayment() {
   tft.fillScreen(ILI9341_BLACK);
   tft.setTextColor(ILI9341_WHITE);
   tft.setCursor(0, 25);
-  tft.println("Please Pay 0.3 dArk by");
+  tft.println("Please Pay 0.1 dARK by");
   tft.println("scanning the QR code");
 
   //--------------------------------------------
@@ -170,7 +168,7 @@ void promptForPayment() {
 
   strcpy(QRdata, "dark:");
   strcat(QRdata, QRcodeArkAddress);
-  strcat(QRdata, "?label=ArkVend&amount=0.3&vendorField=");
+  strcat(QRdata, "?label=ArkVend&amount=0.1&vendorField=");
 
   strcpy(VendorID, "ArkVend_");
   strcat(VendorID, charBuf);      //append random number to the end of the vendorID
@@ -186,11 +184,11 @@ void promptForPayment() {
 
   //--------------------------------------------
   //  Set QRcode background to white
-  tft.fillRoundRect(0, 160, 150, 150, 2, ILI9341_WHITE);     //white background
+  tft.fillRoundRect(0, 190, 140, 130, 5, ILI9341_WHITE);     //white background
 
   //position the QRcode in the middle of the white background
-  uint16_t x0 = 25;
-  uint16_t y0 =  185;   //
+  uint16_t x0 = 20;
+  uint16_t y0 =  206;   //
   //--------------------------------------------
   //display QRcode
   for (uint16_t y = 0; y < qrcode.size; y++) {
