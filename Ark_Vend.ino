@@ -36,6 +36,7 @@
    ESP32 Adafruit Huzzah
       Source: https://www.adafruit.com/product/3315
 
+  https://randomnerdtutorials.com/esp32-pinout-reference-gpios/
 
     TFT FeatherWing 2.4" 320x240 Touchscreen
       Touchscreen is designed to plug direction into ESP32 Huzzah module
@@ -46,6 +47,8 @@
 		SCK		-> SCK
 		MISO	-> MISO
 		MOSI	-> MOSI
+
+   servo1Pin - >
 
 
 		NEOPIXEL-> pin #12
@@ -58,6 +61,20 @@
 /********************************************************************************
                               Library Requirements
 ********************************************************************************/
+
+/********************************************************************************
+  Servo control library
+// Recommended pins for attaching servo include 2,4,12-19,21-23,25-27,32-33 
+********************************************************************************/
+#include <ESP32Servo.h>
+Servo servo1;     //create servo object
+// adjust according to motor specifications
+int minUs = 540;    //default value if not specified: 540
+int maxUs = 2400;   //default value if not specified: 542400
+
+int servo1Pin = 18;
+
+int pos = 0;      // position in degrees (or speed for continuous servo)
 
 /********************************************************************************
 
