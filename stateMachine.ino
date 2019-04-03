@@ -57,7 +57,7 @@ void ArkVendingMachine() {         //The Vending state machine
           tft.setCursor(0, 110);
           tft.setTextColor(ILI9341_RED);
           tft.println("Payment Timeout");
-          vmState = WAIT_FOR_PAY;               //WAIT_FOR_PAY
+          vmState = WAIT_FOR_PAY;             
 
           break;
         }
@@ -112,8 +112,8 @@ void ArkVendingMachine() {         //The Vending state machine
 
 
     case VEND_ITEM: {
-        delay(12000);
-        vmState = DRAW_HOME;             //State is now DROP_CAN
+        delay(10000);
+        vmState = DRAW_HOME;             //
         break;                          //Get out of switch
       }
 
