@@ -130,16 +130,23 @@ void setup()
   //configure the 2.4" TFT display and the touchscreen controller
   setupDisplayTouchscreen();    //
 
+  //setup servo
+  servo1.setPeriodHertz(50);      // Standard 50hz servo
+  servo1.attach(servo1Pin, minUs, maxUs);
+//    servo1.write(pos);
+//    delay(20);             // waits 20ms for the servo to reach the position
 
-//  drawHomeScreen();
 
-//  while (true) {
-//    handleTouchscreen();
-//  }
 
-  
-//  delay(3000);
-//  esp_deep_sleep_start();
+  //  drawHomeScreen();
+
+  //  while (true) {
+  //    handleTouchscreen();
+  //  }
+
+
+  //  delay(3000);
+  //  esp_deep_sleep_start();
 
   //--------------------------------------------
   //  Configure NeoPixels.
@@ -195,12 +202,12 @@ void setup()
   tft.println(lastRXpage);          //this is the page number of the last received transaction. This is also the total number of transactions in the wallet
 
 
-//  setupQRcode();
+  //  setupQRcode();
 
   //--------------------------------------------
   //  System is now configured! Set Neo Pixels to Green
   ConfigureNeoPixels(redgreen);
 
-  delay(2000);
+  delay(2500);
 
 }
