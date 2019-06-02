@@ -1,7 +1,7 @@
 // Color definitions
 //#define ILI9341_BLACK       0x0000  ///<   0,   0,   0
 //#define ILI9341_NAVY        0x000F  ///<   0,   0, 123
-//#define ILI9341_DARKGREEN   0x03E0  ///<   0, 125,   0
+//#define ILI9341_GREEN   0x03E0  ///<   0, 125,   0
 //#define ILI9341_DARKCYAN    0x03EF  ///<   0, 125, 123
 //#define ILI9341_MAROON      0x7800  ///< 123,   0,   0
 //#define ILI9341_PURPLE      0x780F  ///< 123,   0, 123
