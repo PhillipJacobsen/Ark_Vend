@@ -50,7 +50,7 @@
 		MISO	-> MISO
 		MOSI	-> MOSI
 
-   servo1Pin - >
+   servo1Pin - > pin 21
 
 
 		NEOPIXEL-> pin #12
@@ -74,7 +74,7 @@ Servo servo1;     //create servo object
 int minUs = 540;    //default value if not specified: 540
 int maxUs = 2400;   //default value if not specified: 542400
 
-int servo1Pin = 18;
+int servo1Pin = 21;
 
 int pos = 0;      // position in degrees (or speed for continuous servo)
 
@@ -288,7 +288,8 @@ int dst = 0;              //To enable Daylight saving time set it to 3600. Other
 
 unsigned long timeNow;  //variable used to hold current millis() time.
 unsigned long payment_Timeout;
-
+unsigned long timeAPIfinish;  //variable used to hold previous time
+unsigned long timeAPIstart;  //variable used to hold previous time
 
 /********************************************************************************
   WiFi Library
@@ -297,13 +298,13 @@ unsigned long payment_Timeout;
 #include <WiFi.h>
 //--------------------------------------------
 //This is your WiFi network parameters that you need to configure
-//home
-//const char* ssid = "TELUS0183";
-//const char* password = "6z5g4hbdxi";
+//h
+const char* ssid = "TELUS0183";
+const char* password = "6z5g4hbdxi";
 
-//warehouse
-const char* ssid = "TELUS6428";
-const char* password = "3mmkgc9gn2";
+//w
+//const char* ssid = "TELUS6428";
+//const char* password = "3mmkgc9gn2";
 
 
 //const char* ssid = "xxxxxxxxxx";
