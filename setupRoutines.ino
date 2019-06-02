@@ -130,9 +130,14 @@ void setup()
   //configure the 2.4" TFT display and the touchscreen controller
   setupDisplayTouchscreen();    //
 
-  //setup servo
-  servo1.setPeriodHertz(50);      // Standard 50hz servo
-  servo1.attach(servo1Pin, minUs, maxUs);
+  //setup servo //THE FOLLOWING TWO LINES SEEM TO BREAK TOUCHSCREEN!!!!
+//  servo1.setPeriodHertz(50);      // Standard 50hz servo
+ // servo1.attach(servo1Pin, minUs, maxUs);
+
+
+
+
+  
 //    servo1.write(pos);
 //    delay(20);             // waits 20ms for the servo to reach the position
 
@@ -152,9 +157,8 @@ void setup()
   //  Configure NeoPixels.
   //  NOTE! If useing the ESP8266 Make sure to call strip.Begin() after you call Serial.Begin because
   //    Din pin of NeoPixel is also connected to Serial RX pin(on ESP8266) and will configure the pin for usage by the DMA interface.
-  strip.Begin();
-  //  strip.Show(); // Initialize all pixels to 'off'
-  strip.ClearTo(RgbColor(0, 0, 0)); // Initialize all pixels to 'off'
+//  strip.Begin();
+//  strip.ClearTo(RgbColor(0, 0, 0)); // Initialize all pixels to 'off'
 
   //--------------------------------------------
   //setup WiFi connection
@@ -206,7 +210,7 @@ void setup()
 
   //--------------------------------------------
   //  System is now configured! Set Neo Pixels to Green
-  ConfigureNeoPixels(redgreen);
+ // ConfigureNeoPixels(redgreen);
 
   delay(2500);
 
