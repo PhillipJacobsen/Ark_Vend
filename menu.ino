@@ -37,7 +37,8 @@ void drawHomeScreen()
   tft.drawRoundRect(0, 0, 239, 319, 6, ILI9341_WHITE);     //Screen border
   tft.setTextColor(ILI9341_WHITE);
   tft.setCursor(9, 25);
-  tft.println("Ark Vending Machine Demo");
+  tft.println  ("BridgeChain Vending Demo");
+  //tft.println("Ark Vending Machine Demo");
   tft.setTextColor(ArkRed);
   tft.setCursor(34, 50);
   tft.println("Select a Candy");
