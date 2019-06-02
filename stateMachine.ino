@@ -42,8 +42,8 @@ void ArkVendingMachine() {         //The Vending state machine
           Serial.println(searchRXpage);
           Serial.print("Transaction id: ");
           Serial.println(id);
-          Serial.print("Vendor Field: ");
-          Serial.println(vendorField);
+//          Serial.print("Vendor Field: ");
+ //         Serial.println(vendorField);
           vmState = WAIT_FOR_USER;     //stay in the same state
           break;
         }
@@ -61,8 +61,9 @@ void ArkVendingMachine() {         //The Vending state machine
 
           break;
         }
-
+        
         vmState = WAIT_FOR_USER;     //default state
+       // delay(100);
         break;
       }
 
@@ -72,6 +73,7 @@ void ArkVendingMachine() {         //The Vending state machine
         searchRXpage = lastRXpage + 1;
         if ( searchReceivedTransaction(ArkAddress, searchRXpage, id, amount, senderAddress, vendorField) ) {
           //a new transaction has been received.
+          
           Serial.print("Page: ");
           Serial.println(searchRXpage);
           Serial.print("Transaction id: ");
@@ -96,6 +98,7 @@ void ArkVendingMachine() {         //The Vending state machine
           }
           else {
             vmState = WAIT_FOR_PAY;           //
+            delay(100);
             break;                            //Get out of switch
           }
         }
@@ -112,7 +115,10 @@ void ArkVendingMachine() {         //The Vending state machine
 
 
     case VEND_ITEM: {
-        delay(10000);
+       servo1.write(180);
+        delay(5000);
+        servo1.write(90);
+        delay(5000);
         vmState = DRAW_HOME;             //
         break;                          //Get out of switch
       }
