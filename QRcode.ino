@@ -35,7 +35,7 @@ void setupQRcode() {
 
   //qrcode_initText(&qrcode, qrcodeData, QRcode_Version, QRcode_ECC, "ark:AePNZAAtWhLsGFLXtztGLAPnKm98VVC8tJ?amount=10.3");    //ARK address
   //  qrcode_initText(&qrcode, qrcodeData, QRcode_Version, QRcode_ECC, "dark:DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w?amount=0.3");    //dARK address 51 bytes.
-  //  qrcode_initText(&qrcode, qrcodeData, QRcode_Version, QRcode_ECC, "dark:DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w?label=ArkVend&amount=0.3&vendorField=color red");    //dARK address 51 bytes.
+  //  qrcode_initText(&qrcode, qrcodeData, QRcode_Version, QRcode_ECC, ");    //dARK address 51 bytes.
 
 
   //Serial.println(esp_random()); //this is pseudorandom when the wifi or bluetooth does not have a connection. It can be considered "random" when the radios have a connection
@@ -52,9 +52,15 @@ void setupQRcode() {
 
   char QRdata[200];     //what is the maximum size for the QRcode string?
 
+#ifdef JAKEIOT
+  strcpy(QRdata, "ark:");
+#else  
   strcpy(QRdata, "dark:");
+#endif
+  
   strcat(QRdata, QRcodeArkAddress);
   strcat(QRdata, "?label=ArkVend&amount=0.3&vendorField=");
+  //  strcat(QRdata, "?amount=0.3&vendorField=");
 
   strcpy(VendorID, "ArkVend_");
   strcat(VendorID, charBuf);      //append random number to the end of the vendorID
@@ -168,11 +174,23 @@ void promptForPayment() {
 
   char QRdata[200];     //what is the maximum size for the QRcode string?
 
-  strcpy(QRdata, "dark:");
-  strcat(QRdata, QRcodeArkAddress);
-  strcat(QRdata, "?label=ArkVend&amount=0.3&vendorField=");
 
+#ifdef JAKEIOT
+  strcpy(QRdata, "ark:"); 
+#else
+  strcpy(QRdata, "dark:");
+#endif
+  
+  strcat(QRdata, QRcodeArkAddress);
+//  strcat(QRdata, "?label=ArkVend&amount=0.3&vendorField=");
+  strcat(QRdata, "?amount=0.3&vendorField=");
+
+#ifdef JAKEIOT
+  strcpy(VendorID, "jakeIOT_Vend_");
+#else
   strcpy(VendorID, "ArkVend_");
+#endif
+  
   strcat(VendorID, charBuf);      //append random number to the end of the vendorID
 
   strcat(QRdata, VendorID);
