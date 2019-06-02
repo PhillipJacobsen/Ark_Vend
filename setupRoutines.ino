@@ -131,12 +131,10 @@ void setup()
   setupDisplayTouchscreen();    //
 
   //setup servo //THE FOLLOWING TWO LINES SEEM TO BREAK TOUCHSCREEN!!!!
-//  servo1.setPeriodHertz(50);      // Standard 50hz servo
- // servo1.attach(servo1Pin, minUs, maxUs);
+  servo1.setPeriodHertz(50);      // Standard 50hz servo
+  servo1.attach(servo1Pin, minUs, maxUs);
 
-
-
-
+servo1.write(90);
   
 //    servo1.write(pos);
 //    delay(20);             // waits 20ms for the servo to reach the position
@@ -174,7 +172,7 @@ void setup()
   //  returns True if node is synced to chain
   if (checkArkNodeStatus()) {
     Serial.print("\nNode is Synced: ");
-    tft.println("Ark Node is synced");
+    tft.println("BridgeChain Node is synced");
   }
   else {
     Serial.print("\nNode is NOT Synced: ");
@@ -212,6 +210,6 @@ void setup()
   //  System is now configured! Set Neo Pixels to Green
  // ConfigureNeoPixels(redgreen);
 
-  delay(2500);
+  delay(2000);
 
 }
