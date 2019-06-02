@@ -30,6 +30,8 @@
   6. If payment is received then it will display in green text "Payment: ArkVend_(random_number)"
 
 ********************************************************************************/
+#define JAKEIOT
+
 
 /********************************************************************************
                Electronic Hardware Requirements and Pin Connections
@@ -64,7 +66,7 @@
 
 /********************************************************************************
   Servo control library
-// Recommended pins for attaching servo include 2,4,12-19,21-23,25-27,32-33 
+  // Recommended pins for attaching servo include 2,4,12-19,21-23,25-27,32-33
 ********************************************************************************/
 #include <ESP32Servo.h>
 Servo servo1;     //create servo object
@@ -204,17 +206,32 @@ int CursorY = 0;         //used to store current cursor position of the display
 
     The Public API port for the V2 Ark network is '4003'
 */
-const char* peer = "167.114.29.55";
+
+
+
+
+#ifdef JAKEIOT
+const char* peer = "138.197.140.234";  //jakeIOT Testnet Peer
+#else
+//const char* ArkAddress = "DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w";  //old address
+const char* peer = "167.114.29.55";  //Ark Devnet Peer
+#endif
+
 int port = 4003;
 
-//const char* ArkAddress = "DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w";
-const char* ArkAddress = "DFcWwEGwBaYCNb1wxGErGN1TJu8QdQYgCt";
-const char* ArkPublicKey = "029b2f577bd7afd878b258d791abfb379a6ea3c9436a73a77ad6a348ad48a5c0b9";
 
-//char *QRcodeArkAddress = "DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w";  //compiler may place this string in a location in memory that cannot be modified
+#ifdef JAKEIOT
+const char* ArkAddress = "AUjnVRstxXV4qP3wgKvBgv1yiApvbmcHhx";   //jakeIOT testnet address
+const char* ArkPublicKey = "0274a45e0c087b2bc2f68a15a6aa5724b73db46b665a992495a1375c00c29d20a2";       //jakeIOT testnet public key
+char QRcodeArkAddress[] = "AUjnVRstxXV4qP3wgKvBgv1yiApvbmcHhx";   //jakeIOT testnet address
+#else
+const char* ArkAddress = "DFcWwEGwBaYCNb1wxGErGN1TJu8QdQYgCt";   //Ark Devnet address
+const char* ArkPublicKey = "029b2f577bd7afd878b258d791abfb379a6ea3c9436a73a77ad6a348ad48a5c0b9";       //Ark Devnet public key
+char QRcodeArkAddress[] = "DFcWwEGwBaYCNb1wxGErGN1TJu8QdQYgCt";   //Ark Devnet address
+//char *QRcodeArkAddress = "DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w";  //compiler may place this string in a location in memory that cannot be modified //old address
+#endif
 
-//char QRcodeArkAddress[] = "DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w";
-char QRcodeArkAddress[] = "DFcWwEGwBaYCNb1wxGErGN1TJu8QdQYgCt";
+
 
 char VendorID[64];
 
@@ -280,8 +297,15 @@ unsigned long payment_Timeout;
 #include <WiFi.h>
 //--------------------------------------------
 //This is your WiFi network parameters that you need to configure
-const char* ssid = "TELUS0183";
-const char* password = "6z5g4hbdxi";
+//home
+//const char* ssid = "TELUS0183";
+//const char* password = "6z5g4hbdxi";
+
+//warehouse
+const char* ssid = "TELUS6428";
+const char* password = "3mmkgc9gn2";
+
+
 //const char* ssid = "xxxxxxxxxx";
 //const char* password = "xxxxxxxxxx";
 
