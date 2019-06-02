@@ -31,7 +31,15 @@ int searchReceivedTransaction(const char *const address, int page, const char* &
   //--------------------------------------------
   //peform the API
   //sort by oldest transactions first.  For simplicity set limit = 1 so we only get 1 transaction returned
+
+  timeAPIstart = millis();  //get time that API read started
+
   std::string transactionSearchResponse = connection.api.transactions.search( {{"recipientId", address}, {"orderBy", "timestamp:asc"} }, 1, page);
+
+  timeNow = millis() - timeAPIstart;  //get current time
+  Serial.print("API read time:");
+  Serial.println(timeNow);
+
   /**
      transactionSearchResponse return response is a json-formatted object
      The "pretty print" version would look something like this:
@@ -204,6 +212,11 @@ int getMostRecentReceivedTransaction() {
 
   int page = 1;
   while ( searchReceivedTransaction(ArkAddress, page, id, amount, senderAddress, vendorField) ) {
+
+    //    timeNow = millis() - timeAPIfinish;  //get current time
+    //    Serial.print("API read time:");
+    //    Serial.println(timeNow);
+
     Serial.print("Page: ");
     Serial.println(page);
     //   Serial.print("Transaction id: ");
@@ -245,6 +258,9 @@ int getMostRecentReceivedTransaction() {
     }
     page++;
     yield();
+
+    //    timeAPIfinish = millis();  //get time that API read finished
+
   };
   tft.setCursor(CursorXtemp, CursorYtemp);
   tft.setTextColor(ILI9341_BLACK);
