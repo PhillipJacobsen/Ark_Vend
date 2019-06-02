@@ -152,7 +152,7 @@ void promptForPayment() {
   tft.fillScreen(ILI9341_BLACK);
   tft.setTextColor(ILI9341_WHITE);
   tft.setCursor(0, 25);
-  tft.println("Please Pay 0.3 dArk by");
+  tft.println("Please Pay 0.3 JAKE by");
   tft.println("scanning the QR code");
 
   //--------------------------------------------
