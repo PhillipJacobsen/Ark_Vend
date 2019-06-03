@@ -13,6 +13,8 @@ Ark API documentation:  https://docs.ark.io/sdk/clients/usage.html
 
 Electronic Hardware Peripherals:
 	Adafruit TFT FeatherWing 2.4" 320x240 Touchscreen
+	
+	https://youtu.be/sEvz3_K8FPU
     
    <img src="ArkVendHomeScreen.jpg" alt="240x320 TFT screen" width="250"/>    
 
