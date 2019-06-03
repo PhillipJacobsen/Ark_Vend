@@ -134,26 +134,14 @@ void setup()
   servo1.setPeriodHertz(50);      // Standard 50hz servo
   servo1.attach(servo1Pin, minUs, maxUs);
 
-servo1.write(90);
+  servo1.write(90);
   
-//    servo1.write(pos);
-//    delay(20);             // waits 20ms for the servo to reach the position
-
-
-
-  //  drawHomeScreen();
-
-  //  while (true) {
-  //    handleTouchscreen();
-  //  }
-
-
   //  delay(3000);
   //  esp_deep_sleep_start();
 
   //--------------------------------------------
   //  Configure NeoPixels.
-  //  NOTE! If useing the ESP8266 Make sure to call strip.Begin() after you call Serial.Begin because
+  //  NOTE! If using the ESP8266 Make sure to call strip.Begin() after you call Serial.Begin because
   //    Din pin of NeoPixel is also connected to Serial RX pin(on ESP8266) and will configure the pin for usage by the DMA interface.
 //  strip.Begin();
 //  strip.ClearTo(RgbColor(0, 0, 0)); // Initialize all pixels to 'off'
