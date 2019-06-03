@@ -130,24 +130,21 @@ void setup()
   //configure the 2.4" TFT display and the touchscreen controller
   setupDisplayTouchscreen();    //
 
+  //setup servo //THE FOLLOWING TWO LINES SEEM TO BREAK TOUCHSCREEN!!!!
+  servo1.setPeriodHertz(50);      // Standard 50hz servo
+  servo1.attach(servo1Pin, minUs, maxUs);
 
-//  drawHomeScreen();
-
-//  while (true) {
-//    handleTouchscreen();
-//  }
-
+  servo1.write(90);
   
-//  delay(3000);
-//  esp_deep_sleep_start();
+  //  delay(3000);
+  //  esp_deep_sleep_start();
 
   //--------------------------------------------
   //  Configure NeoPixels.
-  //  NOTE! If useing the ESP8266 Make sure to call strip.Begin() after you call Serial.Begin because
+  //  NOTE! If using the ESP8266 Make sure to call strip.Begin() after you call Serial.Begin because
   //    Din pin of NeoPixel is also connected to Serial RX pin(on ESP8266) and will configure the pin for usage by the DMA interface.
-  strip.Begin();
-  //  strip.Show(); // Initialize all pixels to 'off'
-  strip.ClearTo(RgbColor(0, 0, 0)); // Initialize all pixels to 'off'
+//  strip.Begin();
+//  strip.ClearTo(RgbColor(0, 0, 0)); // Initialize all pixels to 'off'
 
   //--------------------------------------------
   //setup WiFi connection
@@ -163,7 +160,7 @@ void setup()
   //  returns True if node is synced to chain
   if (checkArkNodeStatus()) {
     Serial.print("\nNode is Synced: ");
-    tft.println("Ark Node is synced");
+    tft.println("BridgeChain Node is synced");
   }
   else {
     Serial.print("\nNode is NOT Synced: ");
@@ -195,11 +192,11 @@ void setup()
   tft.println(lastRXpage);          //this is the page number of the last received transaction. This is also the total number of transactions in the wallet
 
 
-//  setupQRcode();
+  //  setupQRcode();
 
   //--------------------------------------------
   //  System is now configured! Set Neo Pixels to Green
-  ConfigureNeoPixels(redgreen);
+ // ConfigureNeoPixels(redgreen);
 
   delay(2000);
 

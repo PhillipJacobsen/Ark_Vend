@@ -1,20 +1,19 @@
 /********************************************************************************
-    Proof of Concept Project
-	This projects illustrates a vending machine that accepts Ark Cryptocurrency for payment.
-
-  NOT COMPLETE
+    Proof of Concept Vending Maching Project
+	This projects illustrates a vending machine that accepts Ark Cryptocurrency (or a forked bridgechain) for payment.
 
     Ark_Vend.ino
     2019 @phillipjacobsen
 
     Program Features:
     This program has been tested with ESP32 Adafruit Huzzah however it should also work with ESP8266 modules with minor changes to hardware connections and wifi libraries.
-    This sketch will use the ARK Cpp-Client API to interact with an Ark V2 Devnet node.
+    This sketch uses the ARK Cpp-Client API to interact with an Ark V2 Devnet node.
     Ark Cpp Client available from Ark Ecosystem <info@ark.io>
     Ark API documentation:  https://docs.ark.io/sdk/clients/usage.html
 
     Electronic Hardware Peripherals:
 		Adafruit TFT FeatherWing 2.4" 320x240 Touchscreen
+    Continuous Servo Motor
     Adafruit NeoPixels
 
   Description of the current program flow.  status/debug info is also regularly sent to serial terminal
@@ -23,32 +22,46 @@
   -setup time sync with NTP server and display current time
   -check to see if Ark node is synced and display status
   2. search through all received transactions on wallet. Wallet address is displayed
-  -"searching wallet + page#" will be displayed. text will toggle between red/white every received transaction
+    -"searching wallet + page#" will be displayed. text will toggle between red/white every received transaction
   3. # of transactions in wallet will be displayed
-  4. QR code with Vendor field = "ArkVend_(random number)" is generated
-  5. wallet is continually checked waiting for transaction with vendor field to be received.
-  6. If payment is received then it will display in green text "Payment: ArkVend_(random_number)"
+  4. User Interface with 3 buttons are displayed(only 1 button currently functions("M&M").
+  5. When user selects M&M's a QRcode is displayed along with a timeout displayed.
+  4. QR code includes price, address and Vendor field = "ArkVend_(random number)" when scanned by Ark mobile wallet.
+  5. wallet waits for transaction with vendor field to be received.
+  6. If payment is received then it will indicated success and display in green text "Payment: ArkVend_(random_number)"
+    if incorrect payment is received then received transaction will be ignored.
+  7. Back to Step 4
 
 ********************************************************************************/
+// conditional assembly
+//
+#define JAKEIOT   //this configures system for my custom bridgechain. If undefined then system will be configured for Ark Devnet.
+
 
 /********************************************************************************
                Electronic Hardware Requirements and Pin Connections
-   ESP32 Adafruit Huzzah
-      Source: https://www.adafruit.com/product/3315
-
+    ESP32 Adafruit Huzzah
+      Source: https://www.adafruit.com/product/3213
+      https://randomnerdtutorials.com/esp32-pinout-reference-gpios/
 
     TFT FeatherWing 2.4" 320x240 Touchscreen
+      Source: https://www.adafruit.com/product/3315
       Touchscreen is designed to plug direction into ESP32 Huzzah module
-		TFT_CS 	-> pin #15
-		TFT_DC 	-> pin #33
-		RT 		-> pin #32
-		SD		-> pin #14
-		SCK		-> SCK
-		MISO	-> MISO
-		MOSI	-> MOSI
+    		TFT_CS 	-> pin #15
+    		TFT_DC 	-> pin #33
+    		RT 		-> pin #32
+    		SD		-> pin #14
+    		SCK		-> SCK
+    		MISO	-> MISO
+    		MOSI	-> MOSI
 
+   Continuous servo - Connected to candy machine dial
+       servo1Pin -> pin 21
+       VCC  -> BAT
+       GND  -> GND
 
-		NEOPIXEL-> pin #12
+  //NEOPIXELS NOT CONNECTED YET.
+		NEOPIXEL-> pin
 		VCC -> 3.3V
 		GND
 
@@ -58,6 +71,19 @@
 /********************************************************************************
                               Library Requirements
 ********************************************************************************/
+
+/********************************************************************************
+  Servo control library
+  // Recommended pins for attaching servo include 2,4,12-19,21-23,25-27,32-33
+********************************************************************************/
+#include <ESP32Servo.h>
+Servo servo1;       //create servo object
+// adjust the following according to motor specifications
+int minUs = 540;    //default value if not specified: 540
+int maxUs = 2400;   //default value if not specified: 2400
+
+int servo1Pin = 21;
+int pos = 0;      // position in degrees (or speed for continuous servo)
 
 /********************************************************************************
 
@@ -111,11 +137,11 @@ RgbColor black(0);
     If you have a ? in your QR text then I think the QR code operates in "Byte" mode.
 ********************************************************************************/
 #include "qrcode.h"
-const int QRcode_Version = 8;   //  set the version (range 1->40)
-const int QRcode_ECC = 0;       //  set the Error Correction level (range 0-3) or symbolic (ECC_LOW, ECC_MEDIUM, ECC_QUARTILE and ECC_HIGH)
-#define _QR_doubleSize          //  This will double the display size of the generated code. Every pixel becomes a 4x4 square.
+const int QRcode_Version = 8;   // set the version (range 1->40)
+const int QRcode_ECC = 0;       // set the Error Correction level (range 0-3) or symbolic (ECC_LOW, ECC_MEDIUM, ECC_QUARTILE and ECC_HIGH)
+#define _QR_doubleSize          // This will double the display size of the generated code. Every pixel becomes a 2x2 square.
 
-QRCode qrcode;                  // Create the QR code
+QRCode qrcode;                  // Create the QR code object
 
 
 /********************************************************************************
@@ -145,7 +171,7 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);    //create TFT display
 Adafruit_STMPE610 ts = Adafruit_STMPE610(STMPE_CS);         //create Touchscreen object
 #include <Fonts/FreeSans9pt7b.h>        //add custom fonts here
 
-// This is calibration data for the raw touch data to the screen coordinates
+// This is default calibration data for the raw touch data to the screen coordinates
 //#define TS_MINX 3800
 //#define TS_MAXX 100
 //#define TS_MINY 100
@@ -175,32 +201,43 @@ int CursorY = 0;         //used to store current cursor position of the display
 
 
 /********************************************************************************
-   Ark Client Library
+   Ark Client Library (version 1.2.0)
     Available through Arduino Library Manager
     https://github.com/ArkEcosystem/cpp-client
 ********************************************************************************/
 #include <arkClient.h>
 /**
-    This is the IP address of an Ark Node
-    Specifically, this is a Devnet V2 Node IP
-    You can find more peers here: https://github.com/ArkEcosystem/peers
-
+    This is where you define the IP address of an Ark Node (Or bridgechain node).
+    You can find more Ark Mainnet and Devnet peers here: https://github.com/ArkEcosystem/peers
     The Public API port for the V2 Ark network is '4003'
 */
-const char* peer = "167.114.29.55";
+
+
+#ifdef JAKEIOT
+const char* peer = "138.197.140.234";  //jakeIOT Testnet Peer
+#else
+const char* peer = "167.114.29.55";  //Ark Devnet Peer
+#endif
+
 int port = 4003;
 
-//const char* ArkAddress = "DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w";
-const char* ArkAddress = "DFcWwEGwBaYCNb1wxGErGN1TJu8QdQYgCt";
-const char* ArkPublicKey = "029b2f577bd7afd878b258d791abfb379a6ea3c9436a73a77ad6a348ad48a5c0b9";
+//Wallet Address on bridgechain
+#ifdef JAKEIOT
+const char* ArkAddress = "AUjnVRstxXV4qP3wgKvBgv1yiApvbmcHhx";   //jakeIOT testnet address
+char QRcodeArkAddress[] = "AUjnVRstxXV4qP3wgKvBgv1yiApvbmcHhx";   //jakeIOT testnet address
+const char* ArkPublicKey = "0274a45e0c087b2bc2f68a15a6aa5724b73db46b665a992495a1375c00c29d20a2";       //jakeIOT testnet public key
 
-//char *QRcodeArkAddress = "DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w";  //compiler may place this string in a location in memory that cannot be modified
-
-//char QRcodeArkAddress[] = "DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w";
-char QRcodeArkAddress[] = "DFcWwEGwBaYCNb1wxGErGN1TJu8QdQYgCt";
+//Wallet Address on Ark Devnet
+#else
+const char* ArkAddress = "DFcWwEGwBaYCNb1wxGErGN1TJu8QdQYgCt";   //Ark Devnet address
+char QRcodeArkAddress[] = "DFcWwEGwBaYCNb1wxGErGN1TJu8QdQYgCt";   //Ark Devnet address
+const char* ArkPublicKey = "029b2f577bd7afd878b258d791abfb379a6ea3c9436a73a77ad6a348ad48a5c0b9";       //Ark Devnet public key
+//char *QRcodeArkAddress = "DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w";  //compiler may place this string in a location in memory that cannot be modified 
+#endif
 
 char VendorID[64];
 
+//define the payment timeout in ms
 #define PAYMENT_WAIT_TIME 90000
 
 /**
@@ -233,7 +270,7 @@ int searchRXpage;           //page number that is used for wallet search
 
 
 /********************************************************************************
-   Arduion Json Libary
+   Arduino Json Libary - works with Version5.  NOT compatible with Version6
     Available through Arduino Library Manager
     Data returned from Ark API is in JSON format.
     This libary is used to parse and deserialize the reponse
@@ -248,13 +285,14 @@ int searchRXpage;           //page number that is used for wallet search
 ********************************************************************************/
 #include "time.h"
 //#include <TimeLib.h>    //https://github.com/PaulStoffregen/Time
-int timezone = -6;        //set your timezone MST
-int dst = 0;              //To enable Daylight saving time set it to 3600. Otherwise, set it to 0. This doesn't seem to work.
+int timezone = -6;        //set timezone:  MST
+int dst = 0;              //To enable Daylight saving time set it to 3600. Otherwise, set it to 0. Not sure if this works.
 
 
 unsigned long timeNow;  //variable used to hold current millis() time.
 unsigned long payment_Timeout;
-
+unsigned long timeAPIfinish;  //variable used to measure API access time
+unsigned long timeAPIstart;  //variable used to measure API access time
 
 /********************************************************************************
   WiFi Library
@@ -263,10 +301,17 @@ unsigned long payment_Timeout;
 #include <WiFi.h>
 //--------------------------------------------
 //This is your WiFi network parameters that you need to configure
-const char* ssid = "TELUS0183";
-const char* password = "6z5g4hbdxi";
+
 //const char* ssid = "xxxxxxxxxx";
 //const char* password = "xxxxxxxxxx";
+
+//h
+const char* ssid = "TELUS0183";
+const char* password = "6z5g4hbdxi";
+
+//w
+//const char* ssid = "TELUS6428";
+//const char* password = "3mmkgc9gn2";
 
 
 
@@ -285,7 +330,10 @@ VendingMachineStates vmState = DRAW_HOME;   //initialize the starting state.
 ********************************************************************************/
 void setup();
 int searchReceivedTransaction(const char *const address, int page, const char* &id, int &amount, const char* &senderAddress, const char* &vendorField );
-void ConfigureNeoPixels(RgbColor color);
+
+//NeoPixels not yet connected.
+//void ConfigureNeoPixels(RgbColor color);
+
 void ArkVendingMachine();
 /********************************************************************************
   End Function Prototypes
@@ -298,72 +346,3 @@ void ArkVendingMachine();
 void loop() {
   ArkVendingMachine();
 }
-
-/*
-  void loop() {
-
-  //look for new transactions to arrive in wallet.
-  Serial.print("\n\n\nLooking for new transaction\n");
-
-  delay(1000);
-
-  searchRXpage = lastRXpage + 1;
-  if ( searchReceivedTransaction(ArkAddress, searchRXpage, id, amount, senderAddress, vendorField) ) {
-
-    //a new transaction has been received.
-    Serial.print("Page: ");
-    Serial.println(searchRXpage);
-    Serial.print("Transaction id: ");
-    Serial.println(id);
-    Serial.print("Amount(Arktoshi): ");
-    Serial.println(amount);
-    Serial.print("Amount(Ark): ");
-    Serial.println(float(amount) / 100000000, 8);
-    Serial.print("Sender address: ");
-    Serial.println(senderAddress);
-    Serial.print("Vendor Field: ");
-    Serial.println(vendorField);
-
-    //check to see if vendorField of new transaction matches the field in QRcode that we displayed
-    if  (strcmp(vendorField, VendorID) == 0) {
-      Serial.println("thanks for the payment!");
-      tft.setTextColor(ILI9341_GREEN);
-      tft.print("Payment:");
-      tft.println(VendorID);
-    }
-
-
-    if  (strcmp(vendorField, "led on") == 0) {
-    }
-
-    else if  (strcmp(vendorField, "led off") == 0) {
-      ConfigureNeoPixels(off);
-    }
-
-    else if  (strcmp(vendorField, "color red") == 0) {
-      ConfigureNeoPixels(red);
-    }
-
-    else if  (strcmp(vendorField, "color green") == 0) {
-
-      ConfigureNeoPixels(green);
-    }
-
-    else if  (strcmp(vendorField, "color blue") == 0) {
-      ConfigureNeoPixels(blue);
-    }
-
-    else {
-      Serial.print("Unspecified VendorField: ");
-    }
-    lastRXpage++;
-  }
-
-
-  //no new transaction found.
-  else {
-
-  }
-
-  };
-*/

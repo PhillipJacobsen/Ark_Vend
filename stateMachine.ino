@@ -137,8 +137,11 @@ void ArkVendingMachine() {         //The Vending state machine
 
 
     case VEND_ITEM: {
-        delay(10000);
-        vmState = DRAW_HOME;             //State is now DROP_CAN
+       servo1.write(180);
+        delay(5000);
+        servo1.write(90);
+        delay(5000);
+        vmState = DRAW_HOME;             //
         break;                          //Get out of switch
       }
 
