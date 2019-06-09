@@ -17,6 +17,8 @@ Electronic Hardware Peripherals:
 	https://youtu.be/sEvz3_K8FPU
     
    <img src="ArkVendHomeScreen.jpg" alt="240x320 TFT screen" width="250"/>    
+   <img src="ArkTelegramBot.jpg" alt="Telegram Bot" width="250"/>    
+   
 
 
 
