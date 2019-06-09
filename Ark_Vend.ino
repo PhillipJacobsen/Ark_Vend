@@ -60,6 +60,8 @@
        VCC  -> BAT
        GND  -> GND
 
+   LED -> pin 13  (LED integrated on Huzzah module)
+
   //NEOPIXELS NOT CONNECTED YET.
 		NEOPIXEL-> pin
 		VCC -> 3.3V
@@ -71,6 +73,9 @@
 /********************************************************************************
                               Library Requirements
 ********************************************************************************/
+const int ledPin = 13;    //LED integrated in Adafruit HUZZAH32
+int ledStatus = 0;
+
 
 /********************************************************************************
   Servo control library
@@ -232,7 +237,7 @@ const char* ArkPublicKey = "0274a45e0c087b2bc2f68a15a6aa5724b73db46b665a992495a1
 const char* ArkAddress = "DFcWwEGwBaYCNb1wxGErGN1TJu8QdQYgCt";   //Ark Devnet address
 char QRcodeArkAddress[] = "DFcWwEGwBaYCNb1wxGErGN1TJu8QdQYgCt";   //Ark Devnet address
 const char* ArkPublicKey = "029b2f577bd7afd878b258d791abfb379a6ea3c9436a73a77ad6a348ad48a5c0b9";       //Ark Devnet public key
-//char *QRcodeArkAddress = "DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w";  //compiler may place this string in a location in memory that cannot be modified 
+//char *QRcodeArkAddress = "DHy5z5XNKXhxztLDpT88iD2ozR7ab5Sw2w";  //compiler may place this string in a location in memory that cannot be modified
 #endif
 
 char VendorID[64];
@@ -302,8 +307,64 @@ unsigned long timeAPIstart;  //variable used to measure API access time
 //--------------------------------------------
 //This is your WiFi network parameters that you need to configure
 
-const char* ssid = "xxxxxxxxxx";
-const char* password = "xxxxxxxxxx";
+//const char* ssid = "xxxxxxxxxx";
+//const char* password = "xxxxxxxxxx";
+
+//h
+const char* ssid = "TELUS0183";
+const char* password = "6z5g4hbdxi";
+
+//w
+//const char* ssid = "TELUS6428";
+//const char* password = "3mmkgc9gn2";
+
+
+/********************************************************************************
+  Telegram BOT
+  Bot name: ARK IOT Bot
+  Bot username: arkIOT_bot
+  Use this token to access the HTTP API:
+  818970718:AAGpmML2duFhTGWjVJPsKaZSsrYjk_7S9y4
+  Keep your token secure and store it safely, it can be used by anyone to control your bot.
+
+  For a description of the Bot API, see this page: https://core.telegram.org/bots/api
+  Use this link to create/manage bot via BotFather: https://core.telegram.org/bots#6-botfather
+
+  Telegram library written by Giacarlo Bacchio (Gianbacchio on Github)
+  adapted by Brian Lough
+  https://github.com/witnessmenow/Universal-Arduino-Telegram-Bot
+
+
+  after bot has been created use the following in BotFather to change the list of commands supported by your bot.
+  Users will see these commands as suggestions when they type / in the chat with your bot.
+
+  /setcommands
+  then enter commands like this. all in one chat. It seems you have to add all commands at once. I am not sure how to just add a new command to the list.
+  start - Show list of commands
+  options -Show options keyboard
+  ledon - Turn LED On
+  ledoff - Turn LED Off
+  status - Get LED status
+  name - Get Bot name
+  time - Get current Time
+  balance - Get balance of wallet
+  transactions - Get # of Rx transactions
+
+
+
+********************************************************************************/
+
+#include <WiFiClientSecure.h>
+#include <UniversalTelegramBot.h>
+
+#define BOTtoken "818970718:AAGpmML2duFhTGWjVJPsKaZSsrYjk_7S9y4"  // your Bot Token (Get from Botfather)
+
+WiFiClientSecure client;
+UniversalTelegramBot bot(BOTtoken, client);
+
+int Bot_mtbs = 2000; //mean time between scan messages
+long Bot_lasttime;   //last time messages' scan has been done
+bool Start = false;
 
 
 
@@ -338,4 +399,24 @@ void ArkVendingMachine();
 ********************************************************************************/
 void loop() {
   ArkVendingMachine();
+
+  if (millis() > Bot_lasttime + Bot_mtbs)  {
+
+    timeAPIstart = millis();  //get time that API read started
+    
+    int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
+    
+    timeNow = millis() - timeAPIstart;  //get current time
+    Serial.print("Telegram get update time:");
+    Serial.println(timeNow);
+
+    while (numNewMessages) {
+      Serial.println("got response");
+      handleNewMessages(numNewMessages);
+      numNewMessages = bot.getUpdates(bot.last_message_received + 1);
+    }
+
+    Bot_lasttime = millis();
+  }
+
 }

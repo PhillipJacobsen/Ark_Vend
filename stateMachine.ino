@@ -137,9 +137,19 @@ void ArkVendingMachine() {         //The Vending state machine
 
 
     case VEND_ITEM: {
-       servo1.write(180);
+        servo1.write(180);
         delay(5000);
         servo1.write(90);
+
+        timeAPIstart = millis();  //get time that API read started
+        
+        bot.sendMessage("-348256659", "Dispensing Candy", "");
+        
+        timeNow = millis() - timeAPIstart;  //get current time
+        Serial.print("Telegram send message time:");
+        Serial.println(timeNow);
+
+
         delay(5000);
         vmState = DRAW_HOME;             //
         break;                          //Get out of switch

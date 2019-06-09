@@ -126,6 +126,12 @@ void setup()
   Serial.begin(115200);         // Initialize Serial Connection for debug / display
   while ( !Serial && millis() < 20 );
 
+  pinMode(ledPin, OUTPUT); // initialize digital ledPin as an output.
+  delay(10);
+ // digitalWrite(ledPin, HIGH); // initialize pin as off    //esp8266
+  digitalWrite(ledPin, LOW); // initialize pin as off    //Adafruit HUZZAH32
+  
+  
   //--------------------------------------------
   //configure the 2.4" TFT display and the touchscreen controller
   setupDisplayTouchscreen();    //
@@ -197,7 +203,7 @@ void setup()
   //--------------------------------------------
   //  System is now configured! Set Neo Pixels to Green
  // ConfigureNeoPixels(redgreen);
-
-  delay(2000);
+  bot.sendMessage("-348256659", "Vending machine is ready", "");
+  delay(1500);
 
 }
