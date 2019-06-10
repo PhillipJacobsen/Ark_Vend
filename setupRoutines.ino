@@ -128,10 +128,10 @@ void setup()
 
   pinMode(ledPin, OUTPUT); // initialize digital ledPin as an output.
   delay(10);
- // digitalWrite(ledPin, HIGH); // initialize pin as off    //esp8266
+  // digitalWrite(ledPin, HIGH); // initialize pin as off    //esp8266
   digitalWrite(ledPin, LOW); // initialize pin as off    //Adafruit HUZZAH32
-  
-  
+
+
   //--------------------------------------------
   //configure the 2.4" TFT display and the touchscreen controller
   setupDisplayTouchscreen();    //
@@ -141,7 +141,7 @@ void setup()
   servo1.attach(servo1Pin, minUs, maxUs);
 
   servo1.write(90);
-  
+
   //  delay(3000);
   //  esp_deep_sleep_start();
 
@@ -149,8 +149,8 @@ void setup()
   //  Configure NeoPixels.
   //  NOTE! If using the ESP8266 Make sure to call strip.Begin() after you call Serial.Begin because
   //    Din pin of NeoPixel is also connected to Serial RX pin(on ESP8266) and will configure the pin for usage by the DMA interface.
-//  strip.Begin();
-//  strip.ClearTo(RgbColor(0, 0, 0)); // Initialize all pixels to 'off'
+  //  strip.Begin();
+  //  strip.ClearTo(RgbColor(0, 0, 0)); // Initialize all pixels to 'off'
 
   //--------------------------------------------
   //setup WiFi connection
@@ -202,8 +202,11 @@ void setup()
 
   //--------------------------------------------
   //  System is now configured! Set Neo Pixels to Green
- // ConfigureNeoPixels(redgreen);
+  // ConfigureNeoPixels(redgreen);
   bot.sendMessage("-348256659", "Vending machine is ready", "");
   delay(1500);
+
+  Bot_lasttime = millis();  //initialize Telegram Bot Poll timer
+
 
 }

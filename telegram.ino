@@ -24,7 +24,9 @@ void handleNewMessages(int numNewMessages) {
 
     //response keyboard.
     if (text == "/options" || text == "/options@arkIOT_bot") {
-      String keyboardJson = "[[\"/ledon\", \"/ledoff\"],[\"/status\"]]";
+     // String keyboardJson = "[[\"/ledon\", \"/ledoff\"],[\"/status\"]]";
+    String keyboardJson = "[ [\"/ledon\", \"/ledoff\", \"/status\" ] , [\"/balance\", \"/transactions\"] ]";
+      
       bot.sendMessageWithReplyKeyboard(chat_id, "Choose from one of the following options", "", keyboardJson, true);
     }
 

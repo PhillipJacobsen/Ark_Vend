@@ -362,7 +362,7 @@ const char* password = "6z5g4hbdxi";
 WiFiClientSecure client;
 UniversalTelegramBot bot(BOTtoken, client);
 
-int Bot_mtbs = 2000; //mean time between scan messages
+int Bot_mtbs = 3850; //mean time between scan messages
 long Bot_lasttime;   //last time messages' scan has been done
 bool Start = false;
 
@@ -375,6 +375,10 @@ bool Start = false;
 ********************************************************************************/
 enum VendingMachineStates {DRAW_HOME, WAIT_FOR_USER, WAIT_FOR_PAY, VEND_ITEM};   //The five possible states of the Vending state machine
 VendingMachineStates vmState = DRAW_HOME;   //initialize the starting state.
+
+int ARK_mtbs = 8000; //mean time between polling Ark API for new transactions
+long ARKscan_lasttime;   //last time Ark API poll has been done
+
 
 
 /********************************************************************************
@@ -393,7 +397,7 @@ void ArkVendingMachine();
   End Function Prototypes
 ********************************************************************************/
 
-
+ 
 /********************************************************************************
   MAIN LOOP
 ********************************************************************************/
@@ -403,9 +407,9 @@ void loop() {
   if (millis() > Bot_lasttime + Bot_mtbs)  {
 
     timeAPIstart = millis();  //get time that API read started
-    
+
     int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
-    
+
     timeNow = millis() - timeAPIstart;  //get current time
     Serial.print("Telegram get update time:");
     Serial.println(timeNow);

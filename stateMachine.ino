@@ -23,43 +23,55 @@ bool search_newRX() {
 
 
 void ArkVendingMachine() {         //The Vending state machine
+  // Serial.print("vmState: ");
+  //  Serial.println(vmState);
+
+
   switch (vmState) {              //Depending on the state
 
 
     //--------------------------------------------
     case DRAW_HOME: {
         drawHomeScreen();
+        ARKscan_lasttime = millis();
         vmState = WAIT_FOR_USER;
+
         break;
       }
 
 
     case WAIT_FOR_USER: {
-        //check to see if new new transaction has been received in wallet
-        searchRXpage = lastRXpage + 1;
-        if ( searchReceivedTransaction(ArkAddress, searchRXpage, id, amount, senderAddress, vendorField) ) {
-          //a new unknown transaction has been received.
-          lastRXpage++;
-          Serial.print("Page: ");
-          Serial.println(searchRXpage);
-          Serial.print("Transaction id: ");
-          Serial.println(id);
-          Serial.print("Vendor Field: ");
-          Serial.println(vendorField);
 
-          tft.fillRect(2, 240, 227, 65, ILI9341_BLACK);     //clear the bottom portion of the screen
-          tft.setCursor(4, 250);
-          tft.setTextColor(ILI9341_RED);
-          tft.println("New Transaction in Wallet");
-          tft.setCursor(4, 270);
-          tft.print("Page: ");
-          tft.println(searchRXpage);
-          tft.setCursor(4, 290);
-          tft.print("Vendor Field: ");
-          tft.println(vendorField);
+        if (millis() > ARKscan_lasttime + ARK_mtbs)  {
+ 
+           //check to see if new new transaction has been received in wallet
+          searchRXpage = lastRXpage + 1;
+          if ( searchReceivedTransaction(ArkAddress, searchRXpage, id, amount, senderAddress, vendorField) ) {
+            //a new unknown transaction has been received.
+            lastRXpage++;
+            Serial.print("Page: ");
+            Serial.println(searchRXpage);
+            Serial.print("Transaction id: ");
+            Serial.println(id);
+            Serial.print("Vendor Field: ");
+            Serial.println(vendorField);
 
-          vmState = WAIT_FOR_USER;     //stay in the same state
-          break;
+            tft.fillRect(2, 240, 227, 65, ILI9341_BLACK);     //clear the bottom portion of the screen
+            tft.setCursor(4, 250);
+            tft.setTextColor(ILI9341_RED);
+            tft.println("New Transaction in Wallet");
+            tft.setCursor(4, 270);
+            tft.print("Page: ");
+            tft.println(searchRXpage);
+            tft.setCursor(4, 290);
+            tft.print("Vendor Field: ");
+            tft.println(vendorField);
+
+            ARKscan_lasttime = millis();
+            vmState = WAIT_FOR_USER;     //stay in the same state
+            break;
+          }
+          ARKscan_lasttime = millis();
         }
 
         if (handleTouchscreenV2()) {       //check if touchscreen has been pressed
@@ -142,9 +154,9 @@ void ArkVendingMachine() {         //The Vending state machine
         servo1.write(90);
 
         timeAPIstart = millis();  //get time that API read started
-        
+
         bot.sendMessage("-348256659", "Dispensing Candy", "");
-        
+
         timeNow = millis() - timeAPIstart;  //get current time
         Serial.print("Telegram send message time:");
         Serial.println(timeNow);
