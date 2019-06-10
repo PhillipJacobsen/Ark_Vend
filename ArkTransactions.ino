@@ -37,7 +37,7 @@ int searchReceivedTransaction(const char *const address, int page, const char* &
   std::string transactionSearchResponse = connection.api.transactions.search( {{"recipientId", address}, {"orderBy", "timestamp:asc"} }, 1, page);
 
   timeNow = millis() - timeAPIstart;  //get current time
-  Serial.print("API read time:");
+  Serial.print("Ark API read time:");
   Serial.println(timeNow);
 
   /**
