@@ -209,4 +209,17 @@ void setup()
   Bot_lasttime = millis();  //initialize Telegram Bot Poll timer
 
 
+#ifdef RUN_TELEGRAM_CORE0
+  //create a task that will be executed in the Task1code() function, with priority 1 and executed on core 0
+  xTaskCreatePinnedToCore(
+    Task1code,   /* Task function. */
+    "Task1",     /* name of task. */
+    10000,       /* Stack size of task */
+    NULL,        /* parameter of the task */
+    1,           /* priority of the task  Priority, with 0 being the highest, and 4 being the lowest.   */   
+    &Task1,      /* Task handle to keep track of created task */
+    0);          /* pin task to core 0 */
+  delay(500);
+#endif
+
 }

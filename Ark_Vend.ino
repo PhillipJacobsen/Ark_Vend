@@ -37,6 +37,7 @@
 //
 #define JAKEIOT   //this configures system for my custom bridgechain. If undefined then system will be configured for Ark Devnet.
 
+#define RUN_TELEGRAM_CORE0  //define this to run Telegram interface as a task on Core0. Normally the Arduino application runs on Core1 and the WiFi stack on Core1.
 
 /********************************************************************************
                Electronic Hardware Requirements and Pin Connections
@@ -75,6 +76,26 @@
 ********************************************************************************/
 const int ledPin = 13;    //LED integrated in Adafruit HUZZAH32
 int ledStatus = 0;
+
+
+#ifdef RUN_TELEGRAM_CORE0
+/********************************************************************************
+  Multi Core Execution
+  Free RTOS is already running 
+https://docs.espressif.com/projects/esp-idf/en/latest/api-reference/system/freertos.html
+https://techtutorialsx.com/2017/05/09/esp32-running-code-on-a-specific-core/
+
+
+********************************************************************************/
+TaskHandle_t Task1;
+//TaskHandle_t Task2;
+
+#endif
+
+
+
+
+
 
 
 /********************************************************************************
@@ -362,7 +383,7 @@ const char* password = "6z5g4hbdxi";
 WiFiClientSecure client;
 UniversalTelegramBot bot(BOTtoken, client);
 
-int Bot_mtbs = 3850; //mean time between scan messages
+int Bot_mtbs = 2500; //mean time between scan messages
 long Bot_lasttime;   //last time messages' scan has been done
 bool Start = false;
 
@@ -397,30 +418,64 @@ void ArkVendingMachine();
   End Function Prototypes
 ********************************************************************************/
 
- 
+
+#ifdef RUN_TELEGRAM_CORE0
+//Task1code: handles Telegram interface as a task using Free RTOS
+void Task1code( void * pvParameters ) {
+  Serial.print("Task1 running on core ");
+  Serial.println(xPortGetCoreID());
+
+  for (;;) {
+    if (millis() > Bot_lasttime + Bot_mtbs)  {
+
+      timeAPIstart = millis();  //get time that API read started
+
+      int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
+
+      timeNow = millis() - timeAPIstart;  //get current time
+      Serial.print("Telegram get update time:");
+      Serial.println(timeNow);
+
+      while (numNewMessages) {
+        Serial.println("got response");
+        handleNewMessages(numNewMessages);
+        numNewMessages = bot.getUpdates(bot.last_message_received + 1);
+      }
+
+      Bot_lasttime = millis();
+    }
+  }
+}
+
+#endif
+
+
 /********************************************************************************
   MAIN LOOP
 ********************************************************************************/
 void loop() {
   ArkVendingMachine();
 
-  if (millis() > Bot_lasttime + Bot_mtbs)  {
-
-    timeAPIstart = millis();  //get time that API read started
-
-    int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
-
-    timeNow = millis() - timeAPIstart;  //get current time
-    Serial.print("Telegram get update time:");
-    Serial.println(timeNow);
-
-    while (numNewMessages) {
-      Serial.println("got response");
-      handleNewMessages(numNewMessages);
-      numNewMessages = bot.getUpdates(bot.last_message_received + 1);
+#ifndef RUN_TELEGRAM_CORE0
+  
+    if (millis() > Bot_lasttime + Bot_mtbs)  {
+  
+      timeAPIstart = millis();  //get time that API read started
+  
+      int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
+  
+      timeNow = millis() - timeAPIstart;  //get current time
+      Serial.print("Telegram get update time:");
+      Serial.println(timeNow);
+  
+      while (numNewMessages) {
+        Serial.println("got response");
+        handleNewMessages(numNewMessages);
+        numNewMessages = bot.getUpdates(bot.last_message_received + 1);
+      }
+  
+      Bot_lasttime = millis();
     }
-
-    Bot_lasttime = millis();
-  }
+#endif
 
 }

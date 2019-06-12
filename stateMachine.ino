@@ -158,7 +158,7 @@ void ArkVendingMachine() {         //The Vending state machine
         bot.sendMessage("-348256659", "Dispensing Candy", "");
 
         timeNow = millis() - timeAPIstart;  //get current time
-        Serial.print("Telegram send message time:");
+        Serial.print(" send message time:");
         Serial.println(timeNow);
 
 
