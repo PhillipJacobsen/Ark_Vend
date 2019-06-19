@@ -9,7 +9,7 @@ void promptForPayment() {
   tft.fillScreen(ILI9341_BLACK);
   tft.setTextColor(ILI9341_WHITE);
   tft.setCursor(0, 25);
-#ifdef JAKEIOT
+#ifdef NYBBLE
   tft.println("Please Pay 0.3 JAKE by");
 #else
   tft.println("Please Pay 0.3 dARK by");
@@ -36,7 +36,7 @@ void promptForPayment() {
   char QRdata[200];     //what is the maximum size for the QRcode string that can be encoded?
 
 
-#ifdef JAKEIOT
+#ifdef NYBBLE
   strcpy(QRdata, "ark:");
 #else
   strcpy(QRdata, "dark:");
@@ -46,7 +46,7 @@ void promptForPayment() {
   //  strcat(QRdata, "?label=ArkVend&amount=0.3&vendorField=");
   strcat(QRdata, "?amount=0.3&vendorField=");
 
-#ifdef JAKEIOT
+#ifdef NYBBLE
   strcpy(VendorID, "IOT_Vend_");
 #else
   strcpy(VendorID, "ArkVend_");
@@ -162,7 +162,7 @@ void promptForPayment() {
 
   char QRdata[200];     //what is the maximum size for the QRcode string?
 
-  #ifdef JAKEIOT
+  #ifdef NYBBLE
   strcpy(QRdata, "ark:");
   #else
   strcpy(QRdata, "dark:");

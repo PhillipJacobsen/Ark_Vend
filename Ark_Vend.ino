@@ -35,7 +35,7 @@
 ********************************************************************************/
 // conditional assembly
 //
-#define JAKEIOT   //this configures system for my custom bridgechain. If undefined then system will be configured for Ark Devnet.
+#define NYBBLE   //this configures system for my custom bridgechain. If undefined then system will be configured for Ark Devnet.
 
 #define RUN_TELEGRAM_CORE0  //define this to run Telegram interface as a task on Core0. Normally the Arduino application runs on Core1 and the WiFi stack on Core1.
 
@@ -239,8 +239,8 @@ int CursorY = 0;         //used to store current cursor position of the display
 */
 
 
-#ifdef JAKEIOT
-const char* peer = "138.197.140.234";  //jakeIOT Testnet Peer
+#ifdef NYBBLE
+const char* peer = "159.203.42.124";  //Nybble Testnet Peer
 #else
 const char* peer = "167.114.29.55";  //Ark Devnet Peer
 #endif
@@ -248,10 +248,10 @@ const char* peer = "167.114.29.55";  //Ark Devnet Peer
 int port = 4003;
 
 //Wallet Address on bridgechain
-#ifdef JAKEIOT
-const char* ArkAddress = "AUjnVRstxXV4qP3wgKvBgv1yiApvbmcHhx";   //jakeIOT testnet address
-char QRcodeArkAddress[] = "AUjnVRstxXV4qP3wgKvBgv1yiApvbmcHhx";   //jakeIOT testnet address
-const char* ArkPublicKey = "0274a45e0c087b2bc2f68a15a6aa5724b73db46b665a992495a1375c00c29d20a2";       //jakeIOT testnet public key
+#ifdef NYBBLE
+const char* ArkAddress = "TPW83DRkPcU9KyVZfCKrXMeAKDKExMhAnE";   //NYBBLE testnet address
+char QRcodeArkAddress[] = "TPW83DRkPcU9KyVZfCKrXMeAKDKExMhAnE";   //jakeIOT testnet address
+const char* ArkPublicKey = "02060c5793d2d42f11c8b18018c2c1ed5d81ed0ffc0afd0fe8ef5cee2dfbd3b787";       //jakeIOT testnet public key
 
 //Wallet Address on Ark Devnet
 #else
@@ -426,6 +426,7 @@ void Task1code( void * pvParameters ) {
   Serial.println(xPortGetCoreID());
 
   for (;;) {
+    delay(1);
     if (millis() > Bot_lasttime + Bot_mtbs)  {
 
       timeAPIstart = millis();  //get time that API read started
@@ -455,6 +456,8 @@ void Task1code( void * pvParameters ) {
 ********************************************************************************/
 void loop() {
   ArkVendingMachine();
+  yield();
+  delay(5);
 
 #ifndef RUN_TELEGRAM_CORE0
   
