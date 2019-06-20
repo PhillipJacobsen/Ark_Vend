@@ -37,7 +37,7 @@
 //
 #define NYBBLE   //this configures system for my custom bridgechain. If undefined then system will be configured for Ark Devnet.
 
-#define RUN_TELEGRAM_CORE0  //define this to run Telegram interface as a task on Core0. Normally the Arduino application runs on Core1 and the WiFi stack on Core1.
+//#define RUN_TELEGRAM_CORE0  //define this to run Telegram interface as a task on Core0. Normally the Arduino application runs on Core1 and the WiFi stack on Core1.
 
 /********************************************************************************
                Electronic Hardware Requirements and Pin Connections
@@ -57,7 +57,7 @@
     		MOSI	-> MOSI
 
    Continuous servo - Connected to candy machine dial
-       servo1Pin -> pin 21
+       servo1Pin -> pin 21 
        VCC  -> BAT
        GND  -> GND
 
@@ -348,6 +348,18 @@ const char* password = "6z5g4hbdxi";
   818970718:AAGpmML2duFhTGWjVJPsKaZSsrYjk_7S9y4
   Keep your token secure and store it safely, it can be used by anyone to control your bot.
 
+
+Version2
+  Telegram BOT
+  Bot name: ARK IOT Bot2
+  Bot username: arkIOT2_bot
+  Use this token to access the HTTP API:
+  882229581:AAFl3AKcQAxsRQa2YblEUgOprclQGezZMbA
+  Keep your token secure and store it safely, it can be used by anyone to control your bot.
+
+
+  
+
   For a description of the Bot API, see this page: https://core.telegram.org/bots/api
   Use this link to create/manage bot via BotFather: https://core.telegram.org/bots#6-botfather
 
@@ -378,12 +390,14 @@ const char* password = "6z5g4hbdxi";
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
 
-#define BOTtoken "818970718:AAGpmML2duFhTGWjVJPsKaZSsrYjk_7S9y4"  // your Bot Token (Get from Botfather)
+//#define BOTtoken "818970718:AAGpmML2duFhTGWjVJPsKaZSsrYjk_7S9y4"  // your Bot Token (Get from Botfather)
+#define BOTtoken "882229581:AAFl3AKcQAxsRQa2YblEUgOprclQGezZMbA"  // your Bot Token (Get from Botfather)
+
 
 WiFiClientSecure client;
 UniversalTelegramBot bot(BOTtoken, client);
 
-int Bot_mtbs = 2500; //mean time between scan messages
+int Bot_mtbs = 2800; //mean time between scan messages
 long Bot_lasttime;   //last time messages' scan has been done
 bool Start = false;
 
@@ -426,7 +440,7 @@ void Task1code( void * pvParameters ) {
   Serial.println(xPortGetCoreID());
 
   for (;;) {
-    delay(1);
+   // delay(1);
     if (millis() > Bot_lasttime + Bot_mtbs)  {
 
       timeAPIstart = millis();  //get time that API read started
@@ -456,8 +470,8 @@ void Task1code( void * pvParameters ) {
 ********************************************************************************/
 void loop() {
   ArkVendingMachine();
-  yield();
-  delay(5);
+ // yield();
+//  delay(5);
 
 #ifndef RUN_TELEGRAM_CORE0
   

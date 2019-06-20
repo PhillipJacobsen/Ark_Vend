@@ -6,7 +6,7 @@ void handleNewMessages(int numNewMessages) {
     String chat_id = String(bot.messages[i].chat_id);
     String text = bot.messages[i].text;
     Serial.println(text);
-    //Serial.println(chat_id);
+    Serial.println(chat_id);
 
     String from_name = bot.messages[i].from_name;
     if (from_name == "") from_name = "Guest";
@@ -23,7 +23,7 @@ void handleNewMessages(int numNewMessages) {
     //    }
 
     //response keyboard.
-    if (text == "/options" || text == "/options@arkIOT_bot") {
+    if (text == "/options" || text == "/options@arkIOT2_bot") {
      // String keyboardJson = "[[\"/ledon\", \"/ledoff\"],[\"/status\"]]";
     String keyboardJson = "[ [\"/ledon\", \"/ledoff\", \"/status\" ] , [\"/balance\", \"/transactions\"] ]";
       
@@ -37,14 +37,14 @@ void handleNewMessages(int numNewMessages) {
     //     }
 
 
-    if (text == "/ledon" || text == "/ledon@arkIOT_bot") {
+    if (text == "/ledon" || text == "/ledon@arkIOT2_bot") {
       //digitalWrite(ledPin, LOW);   // turn the LED on (HIGH is the voltage level)   //esp8266
       digitalWrite(ledPin, HIGH);   // turn the LED on (HIGH is the voltage level)     //Heather32
       ledStatus = 1;
       bot.sendMessage(chat_id, "LED is ON", "");
     }
 
-    if (text == "/ledoff" || text == "/ledoff@arkIOT_bot") {
+    if (text == "/ledoff" || text == "/ledoff@arkIOT2_bot") {
       ledStatus = 0;
       //digitalWrite(ledPin, HIGH);    // turn the LED off (LOW is the voltage level)  //esp8266
       digitalWrite(ledPin, LOW);    // turn the LED off (LOW is the voltage level)    //Heather32
@@ -53,12 +53,12 @@ void handleNewMessages(int numNewMessages) {
     }
 
 
-    if (text == "/name" || text == "/name@arkIOT_bot" ) {
+    if (text == "/name" || text == "/name@arkIOT2_bot" ) {
       bot.sendMessage(chat_id, "I am ARK IOT Bot. What do you want master?", "");
     }
 
 
-    if (text == "/time" || text == "/time@arkIOT_bot") {
+    if (text == "/time" || text == "/time@arkIOT2_bot") {
       //  time_t is used to store the number of seconds since the epoch (normally 01/01/1970)
       time_t now = time(nullptr);
       bot.sendMessage(chat_id, ctime(&now), "");      //return the current time
@@ -73,7 +73,7 @@ void handleNewMessages(int numNewMessages) {
 
 
 
-    if (text == "/status" || text == "/status@arkIOT_bot") {
+    if (text == "/status" || text == "/status@arkIOT2_bot") {
       if (ledStatus) {
         bot.sendMessage(chat_id, "Status: Led is ON", "");
       } else {
@@ -81,7 +81,7 @@ void handleNewMessages(int numNewMessages) {
       }
     }
 
-    if (text == "/start" || text == "/start@arkIOT_bot") {
+    if (text == "/start" || text == "/start@arkIOT2_bot") {
       String welcome = "Welcome to Ark Vending Machine Demo Bot, " + from_name + ".\n";
       // welcome += "This is Ark Vending Machine Demo.\n\n";
       welcome += "/options : display option keyboard\n";
@@ -95,7 +95,7 @@ void handleNewMessages(int numNewMessages) {
       bot.sendMessage(chat_id, welcome, "Markdown");
     }
 
-    if (text == "/balance" || text == "/balance@arkIOT_bot" ) {
+    if (text == "/balance" || text == "/balance@arkIOT2_bot" ) {
       //  retrieve balance from wallet
       std::string walletResponse = connection.api.wallets.get(ArkAddress);
       Serial.print("\nWallet: ");
@@ -132,7 +132,7 @@ void handleNewMessages(int numNewMessages) {
 
     }
 
-    if (text == "/transactions" || text == "/transactions@arkIOT_bot" ) {
+    if (text == "/transactions" || text == "/transactions@arkIOT2_bot" ) {
       //  retrieve number of received transactions in wallet
 
       Serial.print("transactions: ");
