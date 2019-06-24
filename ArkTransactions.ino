@@ -24,8 +24,8 @@ int searchReceivedTransaction(const char *const address, int page, const char* &
   //Serial.println(page );
 
   //const std::map<std::string, std::string>& body_parameters, int limit = 5,
-  std::string vendorFieldHexString;
-  vendorFieldHexString = "6964647955";
+//  std::string vendorFieldHexString;
+//  vendorFieldHexString = "6964647955";
   //std::string transactionSearchResponse = connection.api.transactions.search( {{"vendorFieldHex", vendorFieldHexString}, {"orderBy", "timestamp:asc"} },1,1);
 
   //--------------------------------------------
@@ -171,6 +171,7 @@ bool checkArkNodeStatus() {
      }
   */
   const auto nodeStatus = connection.api.node.status();
+
   Serial.print("\nNode Status: ");
   Serial.println(nodeStatus.c_str()); // The response is a 'std::string', to Print on Arduino, we need the c_string type.
 
