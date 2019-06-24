@@ -204,11 +204,11 @@ void setup()
   //  System is now configured! Set Neo Pixels to Green
   // ConfigureNeoPixels(redgreen);
 
- 
- // bot.sendMessage("-348256659", "Vending machine is ready", "");
-bot.sendMessage("-228362617", "Vending machine is ready", "");      //Add @RawDataBot to your group chat to find the chat id.
 
-  
+  // bot.sendMessage("-348256659", "Vending machine is ready", "");
+  bot.sendMessage("-228362617", "Vending machine is ready", "");      //Add @RawDataBot to your group chat to find the chat id.
+
+
   delay(1500);
 
   Bot_lasttime = millis();  //initialize Telegram Bot Poll timer
@@ -223,7 +223,7 @@ bot.sendMessage("-228362617", "Vending machine is ready", "");      //Add @RawDa
     NULL,        /* parameter of the task */
     2,           /* priority of the task  Priority, with 0 being the highest, and 4 being the lowest.   */
     &Task1,      /* Task handle to keep track of created task */
-     //   0);          /* pin task to core 0 */
+    //   0);          /* pin task to core 0 */
     1);          /* pin task to core 1 */
   delay(500);
 #endif
