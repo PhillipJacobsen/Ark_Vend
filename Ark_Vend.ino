@@ -37,6 +37,8 @@
 //
 #define NYBBLE   //this configures system for my custom bridgechain. If undefined then system will be configured for Ark Devnet.
 
+#define ARDUINOJSON_USE_LONG_LONG 1
+
 //#define RUN_TELEGRAM_CORE0  //define this to run Telegram interface as a task on Core0. Normally the Arduino application runs on Core1 and the WiFi stack on Core1.
 
 /********************************************************************************
@@ -265,6 +267,8 @@ char VendorID[64];
 
 //define the payment timeout in ms
 #define PAYMENT_WAIT_TIME 90000
+
+
 
 /**
    This is how you define a connection while speficying the API class as a 'template argument'
