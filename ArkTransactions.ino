@@ -24,8 +24,8 @@ int searchReceivedTransaction(const char *const address, int page, const char* &
   //Serial.println(page );
 
   //const std::map<std::string, std::string>& body_parameters, int limit = 5,
-  //  std::string vendorFieldHexString;
-  //  vendorFieldHexString = "6964647955";
+//  std::string vendorFieldHexString;
+//  vendorFieldHexString = "6964647955";
   //std::string transactionSearchResponse = connection.api.transactions.search( {{"vendorFieldHex", vendorFieldHexString}, {"orderBy", "timestamp:asc"} },1,1);
 
   //--------------------------------------------
@@ -208,8 +208,8 @@ bool checkArkNodeStatus() {
 int getMostRecentReceivedTransaction() {
   Serial.print("\n\n\nHere are all the transactions in a wallet\n");
 
-  //  int CursorXtemp;
-  //  int CursorYtemp;
+  int CursorXtemp;
+  int CursorYtemp;
 
   int page = 1;
   while ( searchReceivedTransaction(ArkAddress, page, id, amount, senderAddress, vendorField) ) {
@@ -231,17 +231,64 @@ int getMostRecentReceivedTransaction() {
     Serial.print("Vendor Field: ");
     Serial.println(vendorField);
 
+    tft.setCursor(CursorX, CursorY);
+    if ( (page & 0x01) == 0) {
+      tft.setTextColor(ILI9341_WHITE);
+      tft.print("searching wallet: ");
+      CursorXtemp = tft.getCursorX();
+      CursorYtemp = tft.getCursorY();
+      tft.setTextColor(ILI9341_BLACK);
+      tft.print(page - 1);
+      tft.setCursor(CursorXtemp, CursorYtemp);
+      tft.setTextColor(ILI9341_WHITE);
+      tft.println(page);
+
+
+    }
+    else {
+      tft.setTextColor(ILI9341_RED);
+      tft.print("searching wallet: ");
+      CursorXtemp = tft.getCursorX();
+      CursorYtemp = tft.getCursorY();
+      tft.setTextColor(ILI9341_BLACK);
+      tft.print(page - 1);
+      tft.setCursor(CursorXtemp, CursorYtemp);
+      tft.setTextColor(ILI9341_RED);
+      tft.println(page);
+      //We need to clear the pixels around the page number every time we refresh.
+    }
     page++;
     yield();
 
     //    timeAPIfinish = millis();  //get time that API read finished
 
   };
-
+  tft.setCursor(CursorXtemp, CursorYtemp);
+  tft.setTextColor(ILI9341_BLACK);
+  tft.println(page - 1);
 
   Serial.print("No more Transactions ");
   Serial.print("\nThe most recent transaction was page #: ");
   Serial.println(page - 1);
 
   return page - 1;
+}
+
+
+
+
+
+
+
+
+//quick test routine.
+void searchTransaction() {
+  //const std::map<std::string, std::string>& body_parameters, int limit = 5,
+  std::string vendorFieldHexString;
+  vendorFieldHexString = "6964647955";
+  //std::string transactionSearchResponse = connection.api.transactions.search( {{"vendorFieldHex", vendorFieldHexString}, {"orderBy", "timestamp:asc"} },1,1);
+  std::string transactionSearchResponse = connection.api.transactions.search( {{"recipientId", ArkAddress}, {"orderBy", "timestamp:asc"} }, 1, 1);
+
+  Serial.print("\nSearch Result Transactions: ");
+  Serial.println(transactionSearchResponse.c_str()); // The response is a 'std::string', to Print on Arduino, we need the c_string type.
 }
