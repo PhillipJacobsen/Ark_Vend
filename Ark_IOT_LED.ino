@@ -2,18 +2,16 @@
     Proof of Concept Vending Maching Project
 	This projects illustrates a vending machine that accepts Ark Cryptocurrency (or a forked bridgechain) for payment.
 
-    Ark_Vend.ino
+    Ark_IOT_LED.ino
     2019 @phillipjacobsen
 
     Program Features:
     This program has been tested with ESP32 Adafruit Huzzah however it should also work with ESP8266 modules with minor changes to hardware connections and wifi libraries.
-    This sketch uses the ARK Cpp-Client API to interact with an Ark V2 Devnet node.
+    This sketch uses the ARK Cpp-Client API to interact with an Ark V2 Devnet node or Custom Ark Bridgechain
     Ark Cpp Client available from Ark Ecosystem <info@ark.io>
     Ark API documentation:  https://docs.ark.io/sdk/clients/usage.html
 
     Electronic Hardware Peripherals:
-		Adafruit TFT FeatherWing 2.4" 320x240 Touchscreen
-    Continuous Servo Motor
     Adafruit NeoPixels
 
   Description of the current program flow.  status/debug info is also regularly sent to serial terminal
@@ -37,14 +35,14 @@
 //
 #define NYBBLE   //this configures system for my custom bridgechain. If undefined then system will be configured for Ark Devnet.
 
-#define ARDUINOJSON_USE_LONG_LONG 1
+#define ARDUINOJSON_USE_LONG_LONG 1     //required for compatiblity between Telegram Library and ArkCrypto library.
 
 //#define RUN_TELEGRAM_CORE0  //define this to run Telegram interface as a task on Core0. Normally the Arduino application runs on Core1 and the WiFi stack on Core1.
 
 /********************************************************************************
                Electronic Hardware Requirements and Pin Connections
     ESP32 Adafruit Huzzah
-      Source: https://www.adafruit.com/product/3213
+      Source: https://www.adafruit.com/product/3405
       https://randomnerdtutorials.com/esp32-pinout-reference-gpios/
 
     TFT FeatherWing 2.4" 320x240 Touchscreen
@@ -58,15 +56,11 @@
     		MISO	-> MISO
     		MOSI	-> MOSI
 
-   Continuous servo - Connected to candy machine dial
-       servo1Pin -> pin 21 
-       VCC  -> BAT
-       GND  -> GND
 
    LED -> pin 13  (LED integrated on Huzzah module)
 
   //NEOPIXELS NOT CONNECTED YET.
-		NEOPIXEL-> pin
+		NEOPIXEL-> pin 12
 		VCC -> 3.3V
 		GND
 
@@ -80,38 +74,7 @@ const int ledPin = 13;    //LED integrated in Adafruit HUZZAH32
 int ledStatus = 0;
 
 
-#ifdef RUN_TELEGRAM_CORE0
-/********************************************************************************
-  Multi Core Execution
-  Free RTOS is already running 
-https://docs.espressif.com/projects/esp-idf/en/latest/api-reference/system/freertos.html
-https://techtutorialsx.com/2017/05/09/esp32-running-code-on-a-specific-core/
 
-
-********************************************************************************/
-TaskHandle_t Task1;
-//TaskHandle_t Task2;
-
-#endif
-
-
-
-
-
-
-
-/********************************************************************************
-  Servo control library
-  // Recommended pins for attaching servo include 2,4,12-19,21-23,25-27,32-33
-********************************************************************************/
-#include <ESP32Servo.h>
-Servo servo1;       //create servo object
-// adjust the following according to motor specifications
-int minUs = 540;    //default value if not specified: 540
-int maxUs = 2400;   //default value if not specified: 2400
-
-int servo1Pin = 21;
-int pos = 0;      // position in degrees (or speed for continuous servo)
 
 /********************************************************************************
 
@@ -153,79 +116,6 @@ RgbColor greenblue(0, colorSaturation, colorSaturation);
 RgbColor black(0);
 
 
-/********************************************************************************
-    QRCode by Richard Moore version 0.0.1
-      Available through Arduino Library Manager
-        https://github.com/ricmoo/QRCode
-
-    The QR code data encoding algorithm defines a number of 'versions' that increase in size and store increasing amounts of data.
-    The version (size) of a generated QR code depends on the amount of data to be encoded.
-    Increasing the error correction level will decrease the storage capacity due to redundancy pixels being added.
-
-    If you have a ? in your QR text then I think the QR code operates in "Byte" mode.
-********************************************************************************/
-#include "qrcode.h"
-const int QRcode_Version = 8;   // set the version (range 1->40)
-const int QRcode_ECC = 0;       // set the Error Correction level (range 0-3) or symbolic (ECC_LOW, ECC_MEDIUM, ECC_QUARTILE and ECC_HIGH)
-#define _QR_doubleSize          // This will double the display size of the generated code. Every pixel becomes a 2x2 square.
-
-QRCode qrcode;                  // Create the QR code object
-
-
-/********************************************************************************
-  GFX libraries for the Adafruit ILI9341 2.4" 240x320 TFT FeatherWing display + touchscreen
-  ----> http://www.adafruit.com/products/3315
-********************************************************************************/
-#include <SPI.h>
-#include <Adafruit_GFX.h>
-#include <Adafruit_ILI9341.h>       //hardware specific library for display
-#include <Adafruit_STMPE610.h>      //hardware specific library for the touch sensor
-
-#ifdef ESP32
-#define STMPE_CS 32
-#define TFT_CS   15
-#define TFT_DC   33
-#define SD_CS    14
-#endif
-#ifdef ESP8266
-#define STMPE_CS 16
-#define TFT_CS   0
-#define TFT_DC   15
-#define SD_CS    2
-#endif
-
-
-Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC);    //create TFT display object
-Adafruit_STMPE610 ts = Adafruit_STMPE610(STMPE_CS);         //create Touchscreen object
-#include <Fonts/FreeSans9pt7b.h>        //add custom fonts here
-
-// This is default calibration data for the raw touch data to the screen coordinates
-//#define TS_MINX 3800
-//#define TS_MAXX 100
-//#define TS_MINY 100
-//#define TS_MAXY 3750
-
-//my calibrated touchscreen data
-#define TS_MINX 3800  //affect left side of screen
-#define TS_MAXX 250   //affect right side of screen.
-#define TS_MINY 205   //
-#define TS_MAXY 3750
-
-//  use these tools to get 16bit hex color definitions  "5-6-5 16-bit mode"
-//  http://www.barth-dev.de/online/rgb565-color-picker/
-//  http://henrysbench.capnfatz.com/henrys-bench/arduino-adafruit-gfx-library-user-guide/arduino-16-bit-tft-rgb565-color-basics-and-selection/
-
-#define ArkRed 0xF1A7       // rgb(241, 55, 58)
-#define ArkLightRed 0xFCD3  // rgb(248, 155, 156)
-
-#define MINPRESSURE 10
-#define MAXPRESSURE 1000
-
-#define Lcd_X  240       //configure your screen dimensions.  We aren't using an LCD for this project so I should rename to something more generic               
-#define Lcd_Y  320       //configure your screen dimensions    
-
-int CursorX = 0;         //used to store current cursor position of the display
-int CursorY = 0;         //used to store current cursor position of the display
 
 
 /********************************************************************************
@@ -345,15 +235,8 @@ const char* password = "6z5g4hbdxi";
 
 
 /********************************************************************************
-  Telegram BOT
-  Bot name: ARK IOT Bot
-  Bot username: arkIOT_bot
-  Use this token to access the HTTP API:
-  818970718:AAGpmML2duFhTGWjVJPsKaZSsrYjk_7S9y4
-  Keep your token secure and store it safely, it can be used by anyone to control your bot.
 
-
-Version2
+  Version2
   Telegram BOT
   Bot name: ARK IOT Bot2
   Bot username: arkIOT2_bot
@@ -362,7 +245,7 @@ Version2
   Keep your token secure and store it safely, it can be used by anyone to control your bot.
 
 
-  
+
 
   For a description of the Bot API, see this page: https://core.telegram.org/bots/api
   Use this link to create/manage bot via BotFather: https://core.telegram.org/bots#6-botfather
@@ -394,7 +277,6 @@ Version2
 #include <WiFiClientSecure.h>
 #include <UniversalTelegramBot.h>
 
-//#define BOTtoken "818970718:AAGpmML2duFhTGWjVJPsKaZSsrYjk_7S9y4"  // your Bot Token (Get from Botfather)
 #define BOTtoken "882229581:AAFl3AKcQAxsRQa2YblEUgOprclQGezZMbA"  // your Bot Token (Get from Botfather)
 
 
@@ -428,7 +310,6 @@ long ARKscan_lasttime;   //last time Ark API poll has been done
 void setup();
 int searchReceivedTransaction(const char *const address, int page, const char* &id, int &amount, const char* &senderAddress, const char* &vendorField );
 
-//NeoPixels not yet connected.
 //void ConfigureNeoPixels(RgbColor color);
 
 void ArkVendingMachine();
@@ -437,66 +318,78 @@ void ArkVendingMachine();
 ********************************************************************************/
 
 
-#ifdef RUN_TELEGRAM_CORE0
-//Task1code: handles Telegram interface as a task using Free RTOS
-void Task1code( void * pvParameters ) {
-  Serial.print("Task1 running on core ");
-  Serial.println(xPortGetCoreID());
-
-  for (;;) {
-   // delay(1);
-    if (millis() > Bot_lasttime + Bot_mtbs)  {
-
-      timeAPIstart = millis();  //get time that API read started
-
-      int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
-
-      timeNow = millis() - timeAPIstart;  //get current time
-      Serial.print("Telegram get update time:");
-      Serial.println(timeNow);
-
-      while (numNewMessages) {
-        Serial.println("got response");
-        handleNewMessages(numNewMessages);
-        numNewMessages = bot.getUpdates(bot.last_message_received + 1);
-      }
-
-      Bot_lasttime = millis();
-    }
-  }
-}
-
-#endif
 
 
 /********************************************************************************
   MAIN LOOP
 ********************************************************************************/
 void loop() {
-  ArkVendingMachine();
- // yield();
-//  delay(5);
+  //  ArkVendingMachine();
 
-#ifndef RUN_TELEGRAM_CORE0
-  
+  if (millis() > ARKscan_lasttime + ARK_mtbs)  {
+    //check to see if new new transaction has been received in wallet
+    searchRXpage = lastRXpage + 1;
+    if ( searchReceivedTransaction(ArkAddress, searchRXpage, id, amount, senderAddress, vendorField) ) {
+      //a new transaction has been received.
+      lastRXpage++;
+      Serial.print("Page: ");
+      Serial.println(searchRXpage);
+      Serial.print("Transaction id: ");
+      Serial.println(id);
+      Serial.print("Vendor Field: ");
+      Serial.println(vendorField);
+
+      //check to see if vendorField of new transaction matches commands
+      if  (strcmp(vendorField, "led on") == 0) {
+      }
+
+      else if  (strcmp(vendorField, "led off") == 0) {
+        ConfigureNeoPixels(off);
+      }
+
+      else if  (strcmp(vendorField, "color red") == 0) {
+        ConfigureNeoPixels(red);
+      }
+
+      else if  (strcmp(vendorField, "color green") == 0) {
+
+        ConfigureNeoPixels(green);
+      }
+
+      else if  (strcmp(vendorField, "color blue") == 0) {
+        ConfigureNeoPixels(blue);
+      }
+
+      else {
+        Serial.print("Unspecified VendorField: ");
+      }
+
+
+    }
+    ARKscan_lasttime = millis();
+  }
+
+
+
+  /*
     if (millis() > Bot_lasttime + Bot_mtbs)  {
-  
+
       timeAPIstart = millis();  //get time that API read started
-  
+
       int numNewMessages = bot.getUpdates(bot.last_message_received + 1);
-  
+
       timeNow = millis() - timeAPIstart;  //get current time
       Serial.print("Telegram get update time:");
       Serial.println(timeNow);
-  
+
       while (numNewMessages) {
         Serial.println("got response");
         handleNewMessages(numNewMessages);
         numNewMessages = bot.getUpdates(bot.last_message_received + 1);
       }
-  
+
       Bot_lasttime = millis();
     }
-#endif
+  */
 
 }

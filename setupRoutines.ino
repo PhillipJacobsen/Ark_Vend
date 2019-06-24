@@ -2,42 +2,11 @@
   This file contains functions used to configure hardware perhipherals and various libraries.
 ********************************************************************************/
 
-/********************************************************************************
-  This routine configures the display and touchscreen
-  There is also LITE pin which is not connected to any pads but you can use to control the backlight. Pull low to turn off the backlight. You can connect it to a PWM output pin.
-  There is also an IRQ pin which is not connected to any pads but you can use to detect when touch events have occured.
-  There is also an Card Detect (CD) pin which is not connected to any pads but you can use to detect when a microSD card has been inserted have occured. It will be shorted to ground when a card is not inserted.
-********************************************************************************/
-void setupDisplayTouchscreen() {
-
-  //--------------------------------------------
-  //  setup 240x320 TFT display with custom font and clear screen
-  // tft.setFont();    //configure standard adafruit font
-  tft.begin();
-  tft.fillScreen(ILI9341_BLACK);  //clear screen
-  tft.setFont(&FreeSans9pt7b);
-
-
-  //--------------------------------------------
-  // setup touchscreencontroller.
-  // NOTE:  When I push the reset button sometimes the controller does not start. I am not sure why. Perhaps there is a reset sequence on the control lines that should be implemented
-  delay(300);
-  if (!ts.begin()) {
-    Serial.println("Couldn't start touchscreen controller");
-    while (1);
-  }
-  Serial.println("Touchscreen started");
-
-}
 
 /********************************************************************************
   This routine waits for a connection to your WiFi network according to "ssid" and "password" defined previously
 ********************************************************************************/
 void setupWiFi() {
-  tft.setCursor(0, 20);
-  tft.setTextColor(ILI9341_WHITE);
-  //  tft.setTextSize(1);
-  tft.println("WiFi Search");
 
   WiFi.begin(ssid, password); // This starts your boards connection to WiFi.
   while (WiFi.status() != WL_CONNECTED) // This will delay your board from continuing until a WiFi connection is established.
@@ -50,10 +19,7 @@ void setupWiFi() {
   Serial.print("Connected, IP address: ");
   Serial.println(WiFi.localIP());
 
-  tft.fillScreen(ILI9341_BLACK);
-  tft.setCursor(0, 20);
-  tft.print("Connected to  ");
-  tft.println(WiFi.localIP());
+
 }
 
 
@@ -78,9 +44,6 @@ void setupTime() {
   Serial.print("time is: ");
   Serial.println(ctime(&now));
 
-  tft.setTextColor(ILI9341_WHITE);
-  //  tft.setTextSize(1);
-  tft.print(ctime(&now));      //dislay the current time
 
   //  struct tm * timeinfo;
   //  time(&now);
@@ -134,13 +97,6 @@ void setup()
 
   //--------------------------------------------
   //configure the 2.4" TFT display and the touchscreen controller
-  setupDisplayTouchscreen();    //
-
-  //setup servo //THE FOLLOWING TWO LINES SEEM TO BREAK TOUCHSCREEN!!!!
-  servo1.setPeriodHertz(50);      // Standard 50hz servo
-  servo1.attach(servo1Pin, minUs, maxUs);
-
-  servo1.write(90);
 
   //  delay(3000);
   //  esp_deep_sleep_start();
@@ -149,8 +105,8 @@ void setup()
   //  Configure NeoPixels.
   //  NOTE! If using the ESP8266 Make sure to call strip.Begin() after you call Serial.Begin because
   //    Din pin of NeoPixel is also connected to Serial RX pin(on ESP8266) and will configure the pin for usage by the DMA interface.
-  //  strip.Begin();
-  //  strip.ClearTo(RgbColor(0, 0, 0)); // Initialize all pixels to 'off'
+  strip.Begin();
+  strip.ClearTo(RgbColor(0, 0, 0)); // Initialize all pixels to 'off'
 
   //--------------------------------------------
   //setup WiFi connection
@@ -160,17 +116,17 @@ void setup()
   //  sync local time to NTP server
   setupTime();
 
+
+
   //--------------------------------------------
   //  check to see if Ark Node is synced
   //  node is defined previously with "peer" and "port"
   //  returns True if node is synced to chain
   if (checkArkNodeStatus()) {
     Serial.print("\nNode is Synced: ");
-    tft.println("BridgeChain Node is synced");
   }
   else {
     Serial.print("\nNode is NOT Synced: ");
-    tft.println("Ark Node is NOT synced");
   }
 
 
@@ -182,50 +138,40 @@ void setup()
   //  Every transaction received will toggle the color of "searching wallet: " text between red and white.
   //  Once we have read all the transactions we will display the total number of transactions in wallet.
   //
-  CursorX = tft.getCursorX();     //get current cursor position
-  CursorY = tft.getCursorY();     //get current cursor position
-  tft.println("searching wallet: ");
-  tft.println(ArkAddress);
+  //  CursorX = tft.getCursorX();     //get current cursor position
+  //  CursorY = tft.getCursorY();     //get current cursor position
+  //  tft.println("searching wallet: ");
+  //  tft.println(ArkAddress);
 
   lastRXpage = getMostRecentReceivedTransaction();  //lastRXpage is equal to the page number of the last received transaction in the wallet.
 
-  tft.setTextColor(ILI9341_WHITE);
-  tft.setCursor(CursorX, CursorY);
-  tft.println("searching wallet: ");
-  tft.println(ArkAddress);
+  //  tft.setTextColor(ILI9341_WHITE);
+  //  tft.setCursor(CursorX, CursorY);
+  //  tft.println("searching wallet: ");
+  //  tft.println(ArkAddress);
 
-  tft.print("# of transactions in wallet: ");
-  tft.println(lastRXpage);          //this is the page number of the last received transaction. This is also the total number of transactions in the wallet
+  ////  tft.print("# of transactions in wallet: ");
+  //  tft.println(lastRXpage);          //this is the page number of the last received transaction. This is also the total number of transactions in the wallet
 
 
   //  setupQRcode();
 
+
+
+
   //--------------------------------------------
   //  System is now configured! Set Neo Pixels to Green
-  // ConfigureNeoPixels(redgreen);
+//  ConfigureNeoPixels(redgreen);
 
-
-  // bot.sendMessage("-348256659", "Vending machine is ready", "");
-  bot.sendMessage("-228362617", "Vending machine is ready", "");      //Add @RawDataBot to your group chat to find the chat id.
+  bot.sendMessage("-228362617", "Ark IOT LED is ready for Commands", "");      //Add @RawDataBot to your group chat to find the chat id.
 
 
   delay(1500);
 
   Bot_lasttime = millis();  //initialize Telegram Bot Poll timer
-
-
-#ifdef RUN_TELEGRAM_CORE0
-  //create a task that will be executed in the Task1code() function, with priority 1 and executed on core 0
-  xTaskCreatePinnedToCore(
-    Task1code,   /* Task function. */
-    "Task1",     /* name of task. */
-    10000,       /* Stack size of task */
-    NULL,        /* parameter of the task */
-    2,           /* priority of the task  Priority, with 0 being the highest, and 4 being the lowest.   */
-    &Task1,      /* Task handle to keep track of created task */
-    //   0);          /* pin task to core 0 */
-    1);          /* pin task to core 1 */
-  delay(500);
-#endif
+  
+  ConfigureNeoPixels(green);
+ // delay(3000);
+//  esp_deep_sleep_start();
 
 }
